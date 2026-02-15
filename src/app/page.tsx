@@ -13,9 +13,7 @@ export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("User");
-
-  // Hardcoded budget for now (could be moved to settings)
-  const budget = 25000;
+  const [budget, setBudget] = useState(20000);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,16 +27,28 @@ export default function Home() {
       setUserName(session.user.email?.split("@")[0] || "User");
 
       // 2. Fetch Expenses
-      const { data, error } = await supabase
+      const { data: expensesData, error: expensesError } = await supabase
         .from("expenses")
         .select("*")
         .order("date", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching expenses:", error);
+      if (expensesError) {
+        console.error("Error fetching expenses:", expensesError);
       } else {
-        setExpenses(data || []);
+        setExpenses(expensesData || []);
       }
+
+      // 3. Fetch Budget Settings
+      const { data: settingsData } = await supabase
+        .from("user_settings")
+        .select("monthly_limit")
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (settingsData) {
+        setBudget(settingsData.monthly_limit);
+      }
+
       setLoading(false);
     };
 

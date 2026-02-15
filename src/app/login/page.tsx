@@ -25,6 +25,9 @@ export default function LoginPage() {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/`,
+                    },
                 });
                 if (error) throw error;
                 // Auto sign in happens if email confirmation is off, otherwise alert

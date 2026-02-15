@@ -63,6 +63,23 @@ alter table public.expenses enable row level security;
 create policy "Users can manage their own expenses"
 on public.expenses for all
 using (auth.uid() = user_id);
+
+-- Create User Settings Table
+create table public.user_settings (
+  user_id uuid references auth.users not null primary key,
+  monthly_limit numeric default 20000,
+  currency text default 'INR',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS
+alter table public.user_settings enable row level security;
+
+-- Create Policies
+create policy "Users can manage their own settings"
+on public.user_settings for all
+using (auth.uid() = user_id);
 ```
 
 ## 4. GitHub Push
