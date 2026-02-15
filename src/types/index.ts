@@ -12,8 +12,7 @@ export interface Expense {
     id: string;
     user_id: string;
     amount: number;
-    category: Category; // Joined
-    category_id: string;
+    category: Category; // Stored as JSONB
     note?: string;
     payment_method: PaymentMethod;
     date: string; // ISO String

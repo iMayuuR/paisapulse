@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CategoryGrid } from "@/components/add-expense/CategoryGrid";
@@ -14,26 +15,49 @@ import { PaymentMethod } from "@/types";
 export default function AddExpensePage() {
     const router = useRouter();
     const [amount, setAmount] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("UPI");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [note, setNote] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Mock categories with IDs
+    // Use default categories with IDs
     const categories = DEFAULT_CATEGORIES.map((cat, index) => ({ ...cat, id: `c-${index}` }));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!amount || !selectedCategory) return;
+        if (!amount || !selectedCategoryId) return;
 
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            console.log({ amount, selectedCategory, paymentMethod, date, note });
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                router.push("/login");
+                return;
+            }
+
+            const selectedCategory = categories.find(c => c.id === selectedCategoryId);
+
+            const { error } = await supabase.from('expenses').insert({
+                user_id: user.id,
+                amount: parseFloat(amount),
+                category: selectedCategory, // Storing full object as JSONB
+                payment_method: paymentMethod,
+                date: new Date(date).toISOString(),
+                note: note,
+            });
+
+            if (error) throw error;
+
             router.push("/");
+        } catch (error) {
+            console.error("Error adding expense:", error);
+            alert("Failed to save expense. Please try again.");
+        } finally {
             setIsSubmitting(false);
-        }, 1000);
+        }
     };
 
     return (
@@ -44,7 +68,7 @@ export default function AddExpensePage() {
                     <ArrowLeft size={24} />
                 </Link>
                 <div className="ml-auto w-10 h-10 rounded-full bg-surface/50 border border-white/5 flex items-center justify-center text-textMuted">
-                    <span className="text-xs font-bold">1/3</span>
+                    <span className="text-xs font-bold">New</span>
                 </div>
             </header>
 
@@ -71,12 +95,11 @@ export default function AddExpensePage() {
                 <div className="space-y-4">
                     <div className="flex justify-between items-center px-1">
                         <label className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Category</label>
-                        <button type="button" className="text-[10px] text-primary hover:underline">View All</button>
                     </div>
                     <CategoryGrid
                         categories={categories}
-                        selectedId={selectedCategory}
-                        onSelect={setSelectedCategory}
+                        selectedId={selectedCategoryId}
+                        onSelect={setSelectedCategoryId}
                     />
                 </div>
 
@@ -137,7 +160,7 @@ export default function AddExpensePage() {
                         variant="neon"
                         type="submit"
                         className="w-full h-16 text-lg font-bold rounded-2xl bg-primary/10 hover:bg-primary/20"
-                        disabled={!amount || !selectedCategory}
+                        disabled={!amount || !selectedCategoryId}
                         isLoading={isSubmitting}
                     >
                         Save Transaction
