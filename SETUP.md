@@ -24,7 +24,22 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-## 2. Database Schema
+## 2. Production URL Configuration (Important!)
+
+Since your app is hosted at `https://paisapulse-ai.vercel.app/`, you must tell Supabase to allow logins from this URL.
+
+1.  Go to **Supabase Dashboard** -> **Authentication** -> **URL Configuration**.
+2.  Set **Site URL** to:
+    ```
+    https://paisapulse-ai.vercel.app
+    ```
+3.  Add the following to **Redirect URLs**:
+    *   `https://paisapulse-ai.vercel.app/`
+    *   `https://paisapulse-ai.vercel.app/**`
+
+**If you don't do this, users will be redirected to localhost after login!**
+
+## 3. Database Schema
 
 Run the following SQL in your Supabase SQL Editor to create the necessary tables:
 
@@ -50,7 +65,7 @@ on public.expenses for all
 using (auth.uid() = user_id);
 ```
 
-## 3. GitHub Push
+## 4. GitHub Push
 
 To push this project to GitHub:
 
