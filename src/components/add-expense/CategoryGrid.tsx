@@ -18,7 +18,7 @@ export function CategoryGrid({ categories, selectedId, onSelect }: CategoryGridP
     // Auto scroll to centered selection could be added here
 
     return (
-        <div className="w-full overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 mask-fade-right">
+        <div className="w-full overflow-x-auto no-scrollbar py-4 -mx-4 px-4 mask-fade-right">
             <div className="flex gap-4 w-max">
                 {categories.map((category) => {
                     const Icon = ICON_MAP[category.icon] || ICON_MAP.MoreHorizontal;

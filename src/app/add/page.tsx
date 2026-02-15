@@ -188,14 +188,14 @@ export default function AddExpensePage() {
                             </div>
                         </div>
 
-                        <div className="relative">
+                        <div className="relative flex justify-center">
                             <input
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="h-14 bg-black/20 text-white rounded-2xl border border-white/5 focus:border-white/20 focus:outline-none px-4 pl-10 w-full appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
+                                className="h-14 bg-black/20 text-white text-center rounded-2xl border border-white/5 focus:border-white/20 focus:outline-none px-4 w-full appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
                             />
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0">
+                            <div className="absolute left-1/2 -translate-x-[40px] top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0">
                                 <Calendar size={18} />
                             </div>
                         </div>
