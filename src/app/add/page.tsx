@@ -113,15 +113,15 @@ export default function AddExpensePage() {
                 {/* Massive Amount Input */}
                 <div className="text-center space-y-2 mt-4">
                     <span className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Enter Amount</span>
-                    <div className="relative inline-block">
-                        <span className="absolute left-[-2rem] top-1/2 -translate-y-1/2 text-4xl font-heading text-textMuted/50">₹</span>
+                    <div className="flex items-center justify-center gap-1">
+                        <span className="text-4xl font-heading text-textMuted/50 pt-2">₹</span>
                         <input
                             type="number"
                             inputMode="numeric"
                             placeholder="0"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            className="w-full bg-transparent text-7xl font-heading font-bold text-white text-center focus:outline-none placeholder:text-white/10 caret-primary"
+                            className="bg-transparent text-7xl font-heading font-bold text-white text-center focus:outline-none placeholder:text-white/10 caret-primary min-w-[1ch] max-w-[6ch]"
                             autoFocus
                         />
                     </div>
@@ -139,12 +139,12 @@ export default function AddExpensePage() {
                     />
 
                     {selectedCategoryId === "custom" && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300 pt-3 pb-1">
                             <Input
                                 placeholder="Enter category name (e.g. Gym, Subscription)"
                                 value={customCategoryName}
                                 onChange={(e) => setCustomCategoryName(e.target.value)}
-                                className="bg-surface border-primary/50 text-white placeholder:text-textMuted/50"
+                                className="bg-surface border-primary/50 text-white placeholder:text-textMuted/50 h-12"
                                 autoFocus
                             />
                         </div>
@@ -193,10 +193,10 @@ export default function AddExpensePage() {
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-14 h-14 bg-black/20 text-transparent rounded-2xl border border-white/5 focus:outline-none cursor-pointer z-10 relative"
+                                className="h-14 bg-black/20 text-white rounded-2xl border border-white/5 focus:border-white/20 focus:outline-none px-4 pl-10 w-full appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
                             />
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 text-textMuted">
-                                <Calendar size={20} />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0">
+                                <Calendar size={18} />
                             </div>
                         </div>
                     </div>
