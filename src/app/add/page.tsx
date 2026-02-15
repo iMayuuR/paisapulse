@@ -19,6 +19,8 @@ export default function AddExpensePage() {
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("UPI");
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [note, setNote] = useState("");
+    const [customCategoryName, setCustomCategoryName] = useState("");
+    const [customPaymentMethod, setCustomPaymentMethod] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Use default categories with IDs
@@ -38,13 +40,47 @@ export default function AddExpensePage() {
                 return;
             }
 
-            const selectedCategory = categories.find(c => c.id === selectedCategoryId);
+            // Determine Category
+            let finalCategory;
+            if (selectedCategoryId === "custom") {
+                if (!customCategoryName.trim()) {
+                    alert("Please enter a custom category name");
+                    setIsSubmitting(false);
+                    return;
+                }
+                finalCategory = {
+                    id: "custom",
+                    name: customCategoryName,
+                    icon: "CircleDashed", // Default icon for custom
+                    is_default: false
+                };
+            } else {
+                finalCategory = categories.find(c => c.id === selectedCategoryId);
+            }
+
+            if (!finalCategory) throw new Error("Invalid category");
+
+            // Determine Payment Method
+            let finalPaymentMethod = paymentMethod;
+            if (paymentMethod === "Other") {
+                if (!customPaymentMethod.trim()) {
+                    alert("Please specify the payment method");
+                    setIsSubmitting(false);
+                    return;
+                }
+                // Cast to PaymentMethod logic or just save as text if schema allows (schema handles text)
+                // But TypeScript type expects PaymentMethod enum. 
+                // We'll trust the Database schema is 'text'. 
+                // For TS, we might need to cast or update type. 
+                // Ideally, 'Other' in UI maps to the custom string in DB. 
+                finalPaymentMethod = customPaymentMethod as PaymentMethod;
+            }
 
             const { error } = await supabase.from('expenses').insert({
                 user_id: user.id,
                 amount: parseFloat(amount),
-                category: selectedCategory, // Storing full object as JSONB
-                payment_method: paymentMethod,
+                category: finalCategory,
+                payment_method: finalPaymentMethod,
                 date: new Date(date).toISOString(),
                 note: note,
             });
@@ -52,9 +88,9 @@ export default function AddExpensePage() {
             if (error) throw error;
 
             router.push("/");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error adding expense:", error);
-            alert("Failed to save expense. Please try again.");
+            alert(`Failed to save expense: ${error.message}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -101,6 +137,18 @@ export default function AddExpensePage() {
                         selectedId={selectedCategoryId}
                         onSelect={setSelectedCategoryId}
                     />
+
+                    {selectedCategoryId === "custom" && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                            <Input
+                                placeholder="Enter category name (e.g. Gym, Subscription)"
+                                value={customCategoryName}
+                                onChange={(e) => setCustomCategoryName(e.target.value)}
+                                className="bg-surface border-primary/50 text-white placeholder:text-textMuted/50"
+                                autoFocus
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-6 bg-white/5 rounded-3xl p-6 border border-white/5 backdrop-blur-sm">

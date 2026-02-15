@@ -4,10 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { Download, Upload, LogOut, ChevronRight, Bell, Shield, Moon, Loader2 } from "lucide-react";
+import { Download, Upload, LogOut, ChevronRight, Bell, Shield, Moon, Loader2, History } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { Expense } from "@/types";
 
 export default function SettingsPage() {
     const router = useRouter();
@@ -15,6 +16,7 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const [monthlyStats, setMonthlyStats] = useState<{ month: string, total: number }[]>([]);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -26,15 +28,36 @@ export default function SettingsPage() {
             }
             setUserId(user.id);
 
-            const { data, error } = await supabase
+            // Fetch Budget
+            const { data: settings } = await supabase
                 .from('user_settings')
                 .select('monthly_limit')
                 .eq('user_id', user.id)
                 .single();
 
-            if (data) {
-                setBudget(data.monthly_limit.toString());
+            if (settings) {
+                setBudget(settings.monthly_limit.toString());
             }
+
+            // Fetch History Stats
+            const { data: expenses } = await supabase
+                .from('expenses')
+                .select('amount, date')
+                .eq('user_id', user.id)
+                .order('date', { ascending: false });
+
+            if (expenses) {
+                const statsMap = new Map<string, number>();
+                expenses.forEach((exp: any) => {
+                    const date = new Date(exp.date);
+                    const key = date.toLocaleDateString("en-IN", { month: 'long', year: 'numeric' });
+                    statsMap.set(key, (statsMap.get(key) || 0) + Number(exp.amount));
+                });
+
+                const statsArray = Array.from(statsMap.entries()).map(([month, total]) => ({ month, total }));
+                setMonthlyStats(statsArray.slice(0, 3)); // Last 3 months
+            }
+
             setLoading(false);
         };
         fetchSettings();
@@ -108,6 +131,23 @@ export default function SettingsPage() {
             </section>
 
             <section className="space-y-3">
+                <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider px-1">History Overview</h2>
+                <Card className="divide-y divide-white/5 overflow-hidden p-0">
+                    {monthlyStats.length > 0 ? monthlyStats.map((stat, idx) => (
+                        <div key={idx} className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <History size={18} className="text-primary" />
+                                <span className="text-sm font-medium text-white">{stat.month}</span>
+                            </div>
+                            <span className="text-sm font-bold text-white">{formatCurrency(stat.total)}</span>
+                        </div>
+                    )) : (
+                        <div className="p-4 text-center text-xs text-textMuted">No history available</div>
+                    )}
+                </Card>
+            </section>
+
+            <section className="space-y-3">
                 <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider px-1">Data</h2>
                 <Card className="divide-y divide-white/5 overflow-hidden p-0">
                     <button className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors text-left">
@@ -137,13 +177,6 @@ export default function SettingsPage() {
                         </div>
                         <span className="text-xs text-textMuted">Always On</span>
                     </div>
-                    <button className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors text-left">
-                        <div className="flex items-center gap-3">
-                            <Bell size={18} className="text-white" />
-                            <span className="text-sm font-medium">Notifications</span>
-                        </div>
-                        <ChevronRight size={16} className="text-textMuted" />
-                    </button>
                 </Card>
             </section>
 

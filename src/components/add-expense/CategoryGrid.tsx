@@ -53,11 +53,28 @@ export function CategoryGrid({ categories, selectedId, onSelect }: CategoryGridP
                     );
                 })}
 
-                <button className="flex flex-col items-center gap-2 opacity-40 hover:opacity-100 transition-opacity">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-white/5 border border-dashed border-white/20 text-white">
+                <button
+                    type="button"
+                    onClick={() => onSelect("custom")}
+                    className={cn(
+                        "group relative flex flex-col items-center gap-2 transition-all duration-300",
+                        selectedId === "custom" ? "scale-105" : "opacity-60 hover:opacity-100"
+                    )}
+                >
+                    <div className={cn(
+                        "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 border backdrop-blur-md",
+                        selectedId === "custom"
+                            ? "bg-primary/20 border-primary text-primary shadow-[0_0_20px_rgba(212,255,0,0.3)]"
+                            : "bg-white/5 border-white/5 text-white group-hover:bg-white/10"
+                    )}>
                         <Plus size={28} />
                     </div>
-                    <span className="text-[10px] text-textMuted uppercase tracking-wide">Custom</span>
+                    <span className={cn(
+                        "text-[10px] font-medium tracking-wide uppercase transition-colors",
+                        selectedId === "custom" ? "text-primary" : "text-textMuted"
+                    )}>
+                        Custom
+                    </span>
                 </button>
             </div>
         </div>
