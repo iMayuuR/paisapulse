@@ -215,7 +215,7 @@ export default function AddExpensePage() {
                 <div className="h-40" />
 
                 {/* Floating Action Button - Moved up to avoid overlap */}
-                <div className="fixed bottom-36 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
+                <div className="fixed bottom-30 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
                     <div className="w-full max-w-md pointer-events-auto">
                         <Button
                             variant="neon"
