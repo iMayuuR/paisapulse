@@ -76,12 +76,22 @@ export default function AddExpensePage() {
                 finalPaymentMethod = customPaymentMethod as PaymentMethod;
             }
 
+            // Combine selected date with current time
+            const now = new Date();
+            const selectedDate = new Date(date);
+
+            // Set time to current time
+            selectedDate.setHours(now.getHours());
+            selectedDate.setMinutes(now.getMinutes());
+            selectedDate.setSeconds(now.getSeconds());
+            selectedDate.setMilliseconds(now.getMilliseconds());
+
             const { error } = await supabase.from('expenses').insert({
                 user_id: user.id,
                 amount: parseFloat(amount),
                 category: finalCategory,
                 payment_method: finalPaymentMethod,
-                date: new Date(date).toISOString(),
+                date: selectedDate.toISOString(), // Send full datetime
                 note: note,
             });
 
@@ -145,7 +155,6 @@ export default function AddExpensePage() {
                                 value={customCategoryName}
                                 onChange={(e) => setCustomCategoryName(e.target.value)}
                                 className="bg-surface border-primary/50 text-white placeholder:text-textMuted/50 h-12"
-                                autoFocus
                             />
                         </div>
                     )}
@@ -203,10 +212,10 @@ export default function AddExpensePage() {
                 </div>
 
                 {/* Spacer for floating button */}
-                <div className="h-32" />
+                <div className="h-40" />
 
-                {/* Floating Action Button */}
-                <div className="fixed bottom-24 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
+                {/* Floating Action Button - Moved up to avoid overlap */}
+                <div className="fixed bottom-36 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
                     <div className="w-full max-w-md pointer-events-auto">
                         <Button
                             variant="neon"
