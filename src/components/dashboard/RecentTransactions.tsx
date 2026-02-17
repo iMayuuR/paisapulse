@@ -19,9 +19,10 @@ const CategoryIcons: Record<string, any> = {
 
 interface RecentTransactionsProps {
     expenses: Expense[];
+    onTransactionDeleted?: (id: string) => void;
 }
 
-export function RecentTransactions({ expenses }: RecentTransactionsProps) {
+export function RecentTransactions({ expenses, onTransactionDeleted }: RecentTransactionsProps) {
     const [sortedExpenses, setSortedExpenses] = useState<Expense[]>([]);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -50,6 +51,11 @@ export function RecentTransactions({ expenses }: RecentTransactionsProps) {
             // Revert on error
             setSortedExpenses(previous);
             alert("Failed to delete transaction.");
+        } else {
+            // Success: Notify parent
+            if (onTransactionDeleted) {
+                onTransactionDeleted(deleteId);
+            }
         }
     };
 
