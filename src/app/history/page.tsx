@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, groupExpensesByYearMonth } from "@/lib/utils";
 import { Expense } from "@/types";
-import { Coffee, ShoppingBag, Car, Zap, Home, MoreHorizontal, Loader2, Trash2, ChevronRight, ChevronDown, Edit2, X } from "lucide-react";
+import { Coffee, ShoppingBag, Car, Zap, Home, MoreHorizontal, Loader2, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
@@ -23,7 +23,6 @@ export default function HistoryPage() {
     const [showConfirm, setShowConfirm] = useState(false);
 
     // View State
-    const [isEditing, setIsEditing] = useState(false);
     const [expandedYear, setExpandedYear] = useState<string | null>(null);
     const [expandedMonth, setExpandedMonth] = useState<string | null>(null);
 
@@ -84,25 +83,15 @@ export default function HistoryPage() {
 
     return (
         <div className="space-y-6 pt-2 pb-24 min-h-full">
-            {/* Header */}
-            <header className="px-1 py-4 flex justify-between items-center bg-[#050505] sticky top-0 z-30 border-b border-white/5">
+            {/* Header - Transparent and Clean */}
+            <header className="px-1 py-4 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-heading font-bold text-white tracking-tight">History</h1>
-                    <p className="text-xs text-textMuted mt-1 font-medium">
-                        {isEditing ? "Tap red icon to delete" : "All your transactions"}
-                    </p>
+                    <p className="text-xs text-textMuted mt-1 font-medium">All your transactions</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => setIsEditing(!isEditing)}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-300 ${isEditing
-                                ? "bg-primary text-black border-primary"
-                                : "bg-white/5 text-white border-white/10 hover:bg-white/10"
-                            }`}
-                    >
-                        {isEditing ? <X size={20} /> : <Edit2 size={18} />}
-                    </button>
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full">
+                    <span className="text-xs font-mono text-primary">{expenses.length} Records</span>
                 </div>
             </header>
 
@@ -166,28 +155,26 @@ export default function HistoryPage() {
 
                                                                 return (
                                                                     <div key={expense.id} className="relative group px-1">
-                                                                        {/* Actions Layer (Delete) - Only relevant if editing */}
-                                                                        {isEditing && (
-                                                                            <div className="absolute inset-y-0 right-0 w-24 flex items-center justify-end pr-4">
-                                                                                <button
-                                                                                    onClick={() => {
-                                                                                        setDeleteId(expense.id);
-                                                                                        setShowConfirm(true);
-                                                                                    }}
-                                                                                    className="w-10 h-10 rounded-full bg-danger/20 text-danger flex items-center justify-center border border-danger/50 shadow-[0_0_15px_rgba(255,46,46,0.3)] hover:scale-110 transition-transform z-20"
-                                                                                >
-                                                                                    <Trash2 size={18} />
-                                                                                </button>
-                                                                            </div>
-                                                                        )}
+                                                                        {/* Actions Layer (Delete) - Always Visible */}
+                                                                        <div className="absolute inset-y-0 right-0 w-24 flex items-center justify-end pr-4">
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    setDeleteId(expense.id);
+                                                                                    setShowConfirm(true);
+                                                                                }}
+                                                                                className="w-10 h-10 rounded-full bg-danger/20 text-danger flex items-center justify-center border border-danger/50 shadow-[0_0_15px_rgba(255,46,46,0.3)] hover:scale-110 transition-transform z-0"
+                                                                            >
+                                                                                <Trash2 size={18} />
+                                                                            </button>
+                                                                        </div>
 
                                                                         {/* Transaction Card */}
                                                                         <motion.div
-                                                                            drag={isEditing ? "x" : false}
+                                                                            drag="x"
                                                                             dragConstraints={{ left: -80, right: 0 }}
                                                                             dragElastic={0.1}
                                                                             whileDrag={{ scale: 0.98 }}
-                                                                            // IMPORTANT: Solid Background to hide previous elements
+                                                                            // Solid Background
                                                                             className="relative z-10 p-4 rounded-2xl bg-[#090909] border border-white/5 flex items-center justify-between touch-pan-y"
                                                                         >
                                                                             <div className="flex items-center gap-4 pointer-events-none">
