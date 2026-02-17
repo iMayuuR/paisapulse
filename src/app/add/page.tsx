@@ -17,7 +17,15 @@ export default function AddExpensePage() {
     const [amount, setAmount] = useState("");
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("UPI");
-    const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+
+    // Fix Date Initialization to use Local Time (IST) instead of UTC
+    const [date, setDate] = useState(() => {
+        const now = new Date();
+        const offset = now.getTimezoneOffset();
+        const localDate = new Date(now.getTime() - (offset * 60 * 1000));
+        return localDate.toISOString().split('T')[0];
+    });
+
     const [note, setNote] = useState("");
     const [customCategoryName, setCustomCategoryName] = useState("");
     const [customPaymentMethod, setCustomPaymentMethod] = useState("");
@@ -27,14 +35,8 @@ export default function AddExpensePage() {
     const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
     useEffect(() => {
-        // Set initial time
         setCurrentTime(new Date());
-
-        // Update time every second
-        const timer = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 1000);
-
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
@@ -101,7 +103,7 @@ export default function AddExpensePage() {
                 amount: parseFloat(amount),
                 category: finalCategory,
                 payment_method: finalPaymentMethod,
-                date: selectedDate.toISOString(), // Send full datetime
+                date: selectedDate.toISOString(),
                 note: note,
             });
 
@@ -200,31 +202,37 @@ export default function AddExpensePage() {
                                 placeholder="Add a note..."
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
-                                className="bg-black/20 border-white/5 pl-4 h-14 rounded-2xl focus:border-white/20"
+                                className="bg-black/20 border-white/5 pl-4 h-12 rounded-xl focus:border-white/20"
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-textMuted hover:text-white cursor-pointer">
-                                <Mic size={18} />
+                                <Mic size={16} />
                             </div>
                         </div>
 
-                        <div className="flex gap-3">
+                        {/* Combined Date & Time Row */}
+                        <div className="flex items-center gap-3 bg-black/20 p-2 rounded-xl border border-white/5">
+                            {/* Date Picker */}
                             <div className="relative flex-1">
                                 <input
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="h-14 bg-black/20 text-white text-center rounded-2xl border border-white/5 focus:border-white/20 focus:outline-none px-4 w-full appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
+                                    className="h-10 bg-transparent text-white text-sm font-medium w-full focus:outline-none appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
                                 />
-                                <div className="absolute left-1/2 -translate-x-[40px] top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0">
-                                    <Calendar size={18} />
+                                <div className="absolute right-2 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0 flex items-center gap-2">
+                                    <span className="text-sm font-mono tracking-wide">{new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                    <Calendar size={14} />
                                 </div>
                             </div>
 
+                            {/* Vertical Divider */}
+                            <div className="w-px h-6 bg-white/10" />
+
                             {/* Real-time Clock */}
-                            <div className="h-14 px-4 bg-black/40 rounded-2xl border border-white/10 flex flex-col items-center justify-center min-w-[110px] backdrop-blur-md">
-                                <span className="text-[10px] text-textMuted font-bold uppercase tracking-wider">IST Time</span>
-                                <span className="text-xl font-mono text-primary font-bold shadow-black drop-shadow-md">
-                                    {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', hour12: false }) : "--:--"}
+                            <div className="flex items-center gap-2 px-2">
+                                <span className="text-[10px] text-textMuted font-bold uppercase tracking-wider">IST</span>
+                                <span className="text-sm font-mono text-primary font-bold min-w-[70px] text-right shadow-[0_0_10px_rgba(212,255,0,0.3)]">
+                                    {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : "--:--:--"}
                                 </span>
                             </div>
                         </div>
@@ -240,7 +248,8 @@ export default function AddExpensePage() {
                         <Button
                             variant="primary"
                             type="submit"
-                            className="w-full h-14 text-lg font-bold rounded-2xl !bg-[#000000] !text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)] relative z-50 opacity-100"
+                            style={{ backgroundColor: '#090909', opacity: 1 }} // STRICT SOLID BLACK
+                            className="w-full h-14 text-lg font-bold rounded-2xl !bg-[#090909] !text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)] relative z-50 opacity-100"
                             disabled={!amount || !selectedCategoryId}
                             isLoading={isSubmitting}
                         >
