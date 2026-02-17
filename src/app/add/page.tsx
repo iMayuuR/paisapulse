@@ -210,16 +210,15 @@ export default function AddExpensePage() {
                         </div>
 
                         {/* Combined Date & Time Row - REFINED */}
-                        <div className="flex items-center gap-0 bg-black/20 p-2 pl-4 rounded-2xl border border-white/5 h-16 relative overflow-hidden group">
+                        <div className="flex items-center justify-between bg-black/20 px-4 rounded-2xl border border-white/5 h-16 relative overflow-hidden group">
 
                             {/* Date Picker Section */}
-                            <div className="relative flex-1 h-full flex items-center">
+                            <div className="relative h-full flex items-center">
                                 {/* The actual input is invisible but covers the area for clicking */}
                                 <input
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    // Key fix: opacity-0 makes text invisible but input clickable
                                     className="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
                                 />
 
@@ -233,12 +232,11 @@ export default function AddExpensePage() {
                             </div>
 
                             {/* Vertical Divider */}
-                            <div className="w-[1px] h-8 bg-white/10 mx-2" />
+                            <div className="w-[1px] h-6 bg-white/10 mx-4" />
 
-                            {/* Real-time Clock Section - Minimalist */}
-                            <div className="flex flex-col items-end justify-center px-4 h-full min-w-[100px]">
-                                <span className="text-[9px] font-bold text-textMuted/60 uppercase tracking-[0.2em] mb-0.5">IST Time</span>
-                                <span className="text-sm font-mono text-primary font-bold tracking-tight shadow-primary/20 drop-shadow-sm">
+                            {/* Real-time Clock Section - Matched to Date Style - Minimalist */}
+                            <div className="flex items-center h-full">
+                                <span className="text-base font-medium tracking-wide text-textMuted group-hover:text-white transition-colors tabular-nums">
                                     {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toLowerCase() : "--:--:--"}
                                 </span>
                             </div>
