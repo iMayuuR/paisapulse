@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,21 @@ export default function AddExpensePage() {
     const [customCategoryName, setCustomCategoryName] = useState("");
     const [customPaymentMethod, setCustomPaymentMethod] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Real-time Clock State
+    const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
+    useEffect(() => {
+        // Set initial time
+        setCurrentTime(new Date());
+
+        // Update time every second
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
 
     // Use default categories with IDs
     const categories = DEFAULT_CATEGORIES.map((cat, index) => ({ ...cat, id: `c-${index}` }));
@@ -68,11 +83,6 @@ export default function AddExpensePage() {
                     setIsSubmitting(false);
                     return;
                 }
-                // Cast to PaymentMethod logic or just save as text if schema allows (schema handles text)
-                // But TypeScript type expects PaymentMethod enum. 
-                // We'll trust the Database schema is 'text'. 
-                // For TS, we might need to cast or update type. 
-                // Ideally, 'Other' in UI maps to the custom string in DB. 
                 finalPaymentMethod = customPaymentMethod as PaymentMethod;
             }
 
@@ -183,8 +193,8 @@ export default function AddExpensePage() {
                         </div>
                     </div>
 
-                    {/* Note & Date */}
-                    <div className="grid grid-cols-[1fr,auto] gap-4 items-center">
+                    {/* Note & Date & Time */}
+                    <div className="space-y-3">
                         <div className="relative">
                             <Input
                                 placeholder="Add a note..."
@@ -197,15 +207,25 @@ export default function AddExpensePage() {
                             </div>
                         </div>
 
-                        <div className="relative flex justify-center">
-                            <input
-                                type="date"
-                                value={date}
-                                onChange={(e) => setDate(e.target.value)}
-                                className="h-14 bg-black/20 text-white text-center rounded-2xl border border-white/5 focus:border-white/20 focus:outline-none px-4 w-full appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
-                            />
-                            <div className="absolute left-1/2 -translate-x-[40px] top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0">
-                                <Calendar size={18} />
+                        <div className="flex gap-3">
+                            <div className="relative flex-1">
+                                <input
+                                    type="date"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    className="h-14 bg-black/20 text-white text-center rounded-2xl border border-white/5 focus:border-white/20 focus:outline-none px-4 w-full appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative cursor-pointer"
+                                />
+                                <div className="absolute left-1/2 -translate-x-[40px] top-1/2 -translate-y-1/2 text-textMuted pointer-events-none z-0">
+                                    <Calendar size={18} />
+                                </div>
+                            </div>
+
+                            {/* Real-time Clock */}
+                            <div className="h-14 px-4 bg-black/20 rounded-2xl border border-white/5 flex flex-col items-center justify-center min-w-[100px]">
+                                <span className="text-[10px] text-textMuted font-bold uppercase tracking-wider">IST Time</span>
+                                <span className="text-sm font-mono text-primary font-bold">
+                                    {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', hour12: true }) : "--:--"}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -214,13 +234,14 @@ export default function AddExpensePage() {
                 {/* Spacer for floating button */}
                 <div className="h-40" />
 
-                {/* Floating Action Button - Moved up to avoid overlap */}
-                <div className="fixed bottom-30 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
+                {/* Floating Action Button */}
+                <div className="fixed bottom-32 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
                     <div className="w-full max-w-md pointer-events-auto">
                         <Button
                             variant="neon"
                             type="submit"
-                            className="w-full h-14 text-lg font-bold rounded-2xl bg-[#090909] text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)]"
+                            // Using !bg-black to strictly enforce solid background
+                            className="w-full h-14 text-lg font-bold rounded-2xl bg-black text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)]"
                             disabled={!amount || !selectedCategoryId}
                             isLoading={isSubmitting}
                         >
