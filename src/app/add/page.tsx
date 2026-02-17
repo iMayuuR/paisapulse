@@ -221,10 +221,10 @@ export default function AddExpensePage() {
                             </div>
 
                             {/* Real-time Clock */}
-                            <div className="h-14 px-4 bg-black/20 rounded-2xl border border-white/5 flex flex-col items-center justify-center min-w-[100px]">
+                            <div className="h-14 px-4 bg-black/40 rounded-2xl border border-white/10 flex flex-col items-center justify-center min-w-[110px] backdrop-blur-md">
                                 <span className="text-[10px] text-textMuted font-bold uppercase tracking-wider">IST Time</span>
-                                <span className="text-sm font-mono text-primary font-bold">
-                                    {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', hour12: true }) : "--:--"}
+                                <span className="text-xl font-mono text-primary font-bold shadow-black drop-shadow-md">
+                                    {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', hour12: false }) : "--:--"}
                                 </span>
                             </div>
                         </div>
@@ -232,16 +232,15 @@ export default function AddExpensePage() {
                 </div>
 
                 {/* Spacer for floating button */}
-                <div className="h-40" />
+                <div className="h-48" />
 
                 {/* Floating Action Button */}
                 <div className="fixed bottom-32 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
                     <div className="w-full max-w-md pointer-events-auto">
                         <Button
-                            variant="neon"
+                            variant="primary"
                             type="submit"
-                            // Using !bg-black to strictly enforce solid background
-                            className="w-full h-14 text-lg font-bold rounded-2xl bg-black text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)]"
+                            className="w-full h-14 text-lg font-bold rounded-2xl !bg-[#000000] !text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)] relative z-50 opacity-100"
                             disabled={!amount || !selectedCategoryId}
                             isLoading={isSubmitting}
                         >
