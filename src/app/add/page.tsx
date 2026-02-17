@@ -202,17 +202,22 @@ export default function AddExpensePage() {
                     </div>
                 </div>
 
+                {/* Spacer for floating button */}
+                <div className="h-32" />
+
                 {/* Floating Action Button */}
-                <div className="flex-1 content-end">
-                    <Button
-                        variant="neon"
-                        type="submit"
-                        className="w-full h-16 text-lg font-bold rounded-2xl bg-primary/10 hover:bg-primary/20"
-                        disabled={!amount || !selectedCategoryId}
-                        isLoading={isSubmitting}
-                    >
-                        Save Transaction
-                    </Button>
+                <div className="fixed bottom-24 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
+                    <div className="w-full max-w-md pointer-events-auto">
+                        <Button
+                            variant="neon"
+                            type="submit"
+                            className="w-full h-14 text-lg font-bold rounded-2xl bg-[#090909] text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)]"
+                            disabled={!amount || !selectedCategoryId}
+                            isLoading={isSubmitting}
+                        >
+                            Save Transaction
+                        </Button>
+                    </div>
                 </div>
             </form>
         </div>
