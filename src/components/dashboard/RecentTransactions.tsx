@@ -19,6 +19,8 @@ interface RecentTransactionsProps {
 }
 
 export function RecentTransactions({ expenses }: RecentTransactionsProps) {
+    const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
     return (
         <div className="space-y-4 pb-12">
             <div className="flex justify-between items-center px-1">
@@ -32,7 +34,7 @@ export function RecentTransactions({ expenses }: RecentTransactionsProps) {
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {expenses.map((expense, index) => {
+                    {sortedExpenses.map((expense, index) => {
                         const Icon = CategoryIcons[expense.category.name] || CategoryIcons.Default;
 
                         return (

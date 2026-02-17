@@ -26,6 +26,7 @@ export function CategoryGrid({ categories, selectedId, onSelect }: CategoryGridP
 
                     return (
                         <button
+                            type="button"
                             key={category.id}
                             onClick={() => onSelect(category.id)}
                             className={cn(
