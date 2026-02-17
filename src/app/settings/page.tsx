@@ -138,39 +138,40 @@ export default function SettingsPage() {
             {/* Profile Section */}
             <section className="space-y-3">
                 <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider px-1">Profile</h2>
-                <Card className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-primary">
+                <Card className="p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-primary shrink-0">
                             <User size={20} />
                         </div>
-                        <div className="flex-1">
-                            <label className="text-[10px] text-textMuted uppercase tracking-wider">Display Name</label>
+                        <div className="flex-1 min-w-0">
+                            <label className="text-[10px] text-textMuted uppercase tracking-wider block mb-1">Display Name</label>
                             {isEditingName ? (
-                                <Input
-                                    value={displayName}
-                                    onChange={(e) => setDisplayName(e.target.value)}
-                                    className="h-8 bg-black/20 border-primary/50 text-sm"
-                                    autoFocus
-                                />
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        value={displayName}
+                                        onChange={(e) => setDisplayName(e.target.value)}
+                                        className="h-9 bg-black/20 border-primary/50 text-sm w-full max-w-[200px]"
+                                        autoFocus
+                                    />
+                                    <div className="flex gap-1 shrink-0">
+                                        <Button size="icon" variant="ghost" className="h-9 w-9 text-danger hover:bg-danger/10" onClick={() => setIsEditingName(false)}>
+                                            <X size={18} />
+                                        </Button>
+                                        <Button size="icon" variant="ghost" className="h-9 w-9 text-primary hover:bg-primary/10" onClick={handleSaveName} isLoading={saving}>
+                                            <Check size={18} />
+                                        </Button>
+                                    </div>
+                                </div>
                             ) : (
-                                <p className="text-sm font-medium text-white">{displayName}</p>
+                                <div className="flex items-center justify-between w-full">
+                                    <p className="text-sm font-medium text-white truncate">{displayName}</p>
+                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-textMuted hover:text-white shrink-0" onClick={() => setIsEditingName(true)}>
+                                        <Edit2 size={16} />
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </div>
-                    {isEditingName ? (
-                        <div className="flex gap-2">
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-danger hover:bg-danger/10" onClick={() => setIsEditingName(false)}>
-                                <X size={16} />
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={handleSaveName} isLoading={saving}>
-                                <Check size={16} />
-                            </Button>
-                        </div>
-                    ) : (
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-textMuted hover:text-white" onClick={() => setIsEditingName(true)}>
-                            <Edit2 size={16} />
-                        </Button>
-                    )}
                 </Card>
             </section>
 
