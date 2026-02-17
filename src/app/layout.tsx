@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   title: "PaisaPulse",
   description: "Smart Monthly Budget Tracker",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export const viewport: Viewport = {
