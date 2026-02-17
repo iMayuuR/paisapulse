@@ -71,7 +71,6 @@ export default function HistoryPage() {
     }
 
     return (
-    return (
         <div className="space-y-6 pt-2 pb-24 min-h-full">
             <header className="px-1 py-4 flex justify-between items-center">
                 <div>
