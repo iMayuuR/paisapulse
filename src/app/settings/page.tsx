@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { Download, Upload, LogOut, ChevronRight, History, Edit2, Check, X, User } from "lucide-react";
+import { Download, Upload, LogOut, ChevronRight, History, Edit2, Check, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -12,12 +12,10 @@ import { useRouter } from "next/navigation";
 export default function SettingsPage() {
     const router = useRouter();
     const [budget, setBudget] = useState("20000");
-    const [displayName, setDisplayName] = useState("");
-    const [loading, setLoading] = useState(true); // Fix: Start as true to prevent flash
+    const [loading, setLoading] = useState(true);
 
     // Edit Modes
     const [isEditingBudget, setIsEditingBudget] = useState(false);
-    const [isEditingName, setIsEditingName] = useState(false);
     const [saving, setSaving] = useState(false);
 
     const [userId, setUserId] = useState<string | null>(null);
@@ -25,25 +23,22 @@ export default function SettingsPage() {
 
     useEffect(() => {
         const fetchSettings = async () => {
-            // setLoading(true); // Already true
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 router.push("/login");
                 return;
             }
             setUserId(user.id);
-            setDisplayName(user.email?.split("@")[0] || "User");
 
-            // Fetch Settings (Budget & Display Name)
+            // Fetch Settings (Budget Only)
             const { data: settings } = await supabase
                 .from('user_settings')
-                .select('monthly_limit, display_name')
+                .select('monthly_limit')
                 .eq('user_id', user.id)
                 .single();
 
             if (settings) {
                 setBudget(settings.monthly_limit.toString());
-                if (settings.display_name) setDisplayName(settings.display_name);
             }
 
             // Fetch Expenses for History
@@ -90,34 +85,9 @@ export default function SettingsPage() {
         setSaving(false);
     };
 
-    const handleSaveName = async () => {
-        if (!userId) return;
-        if (!displayName.trim()) {
-            alert("Display name cannot be empty");
-            return;
-        }
-        setSaving(true);
-
-        const { error } = await supabase
-            .from('user_settings')
-            .upsert({
-                user_id: userId,
-                display_name: displayName.trim(),
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
-
-        if (error) {
-            console.error("Error saving name:", error);
-            alert("Failed to save name");
-        } else {
-            setIsEditingName(false);
-        }
-        setSaving(false);
-    };
-
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        router.push("/login"); // Fixed route
+        router.push("/login");
     };
 
     if (loading) {
@@ -134,46 +104,6 @@ export default function SettingsPage() {
                 <h1 className="text-2xl font-bold text-white">Settings</h1>
                 <p className="text-xs text-textMuted">Preferences & Account</p>
             </header>
-
-            {/* Profile Section */}
-            <section className="space-y-3">
-                <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider px-1">Profile</h2>
-                <Card className="p-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1">
-                        <div className="w-10 h-10 rounded-full bg-surface border border-white/10 flex items-center justify-center text-primary shrink-0">
-                            <User size={20} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <label className="text-[10px] text-textMuted uppercase tracking-wider block mb-1">Display Name</label>
-                            {isEditingName ? (
-                                <div className="flex items-center gap-2">
-                                    <Input
-                                        value={displayName}
-                                        onChange={(e) => setDisplayName(e.target.value)}
-                                        className="h-9 bg-black/20 border-primary/50 text-sm w-full max-w-[200px]"
-                                        autoFocus
-                                    />
-                                    <div className="flex gap-1 shrink-0">
-                                        <Button size="icon" variant="ghost" className="h-9 w-9 text-danger hover:bg-danger/10" onClick={() => setIsEditingName(false)}>
-                                            <X size={18} />
-                                        </Button>
-                                        <Button size="icon" variant="ghost" className="h-9 w-9 text-primary hover:bg-primary/10" onClick={handleSaveName} isLoading={saving}>
-                                            <Check size={18} />
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex items-center justify-between w-full">
-                                    <p className="text-sm font-medium text-white truncate">{displayName}</p>
-                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-textMuted hover:text-white shrink-0" onClick={() => setIsEditingName(true)}>
-                                        <Edit2 size={16} />
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </Card>
-            </section>
 
             {/* Budget Section */}
             <section className="space-y-3">
@@ -263,7 +193,7 @@ export default function SettingsPage() {
                     Sign Out
                 </Button>
                 <p className="text-[10px] text-center text-textMuted mt-4 opacity-50">
-                    PaisaPulse v1.2.0
+                    PaisaPulse v1.3.0
                 </p>
             </section>
         </div>
