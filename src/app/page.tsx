@@ -116,6 +116,10 @@ export default function Home() {
 
   const spent = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
 
+  const handleTransactionDeleted = (deletedId: string) => {
+    setExpenses(prev => prev.filter(e => e.id !== deletedId));
+  };
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -159,7 +163,10 @@ export default function Home() {
 
       <BudgetOverview budget={budget} spent={spent} />
 
-      <RecentTransactions expenses={expenses.slice(0, 5)} />
+      <RecentTransactions
+        expenses={expenses.slice(0, 5)}
+        onTransactionDeleted={handleTransactionDeleted}
+      />
     </div>
   );
 }
