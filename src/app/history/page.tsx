@@ -71,22 +71,25 @@ export default function HistoryPage() {
     }
 
     return (
-        <div className="space-y-6 pt-4 min-h-full pb-20">
-            <header className="px-1 sticky top-0 bg-[#050505]/80 backdrop-blur-md z-20 py-4 border-b border-white/5 flex justify-between items-end">
+    return (
+        <div className="space-y-6 pt-2 pb-24 min-h-full">
+            <header className="px-1 py-4 flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">History</h1>
-                    <p className="text-xs text-textMuted mt-0.5">All your past transactions</p>
+                    <h1 className="text-3xl font-heading font-bold text-white tracking-tight">History</h1>
+                    <p className="text-xs text-textMuted mt-1 font-medium">All your transactions</p>
                 </div>
-                <span className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-primary border border-white/5">{expenses.length} Records</span>
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full">
+                    <span className="text-xs font-mono text-primary">{expenses.length} Records</span>
+                </div>
             </header>
 
-            <div className="space-y-8 px-1">
+            <div className="space-y-8">
                 {sortedDates.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 gap-3 opacity-50">
-                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
-                            <MoreHorizontal className="text-textMuted" />
+                    <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-50">
+                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                            <MoreHorizontal size={32} className="text-textMuted" />
                         </div>
-                        <p className="text-sm text-textMuted">No transactions yet.</p>
+                        <p className="text-sm text-textMuted">No transactions found</p>
                     </div>
                 ) : (
                     sortedDates.map((date) => {
@@ -94,14 +97,15 @@ export default function HistoryPage() {
 
                         return (
                             <div key={date} className="space-y-3">
-                                <div className="flex justify-between items-center sticky top-20 z-10 py-1 bg-[#050505]/95 backdrop-blur">
-                                    <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider">
+                                {/* Date Header - Removed Sticky Black Bar */}
+                                <div className="flex justify-between items-end px-1 pb-1">
+                                    <h3 className="text-xs font-bold text-textMuted/80 uppercase tracking-widest pl-1">
                                         {new Date(date).toLocaleDateString("en-IN", { weekday: 'short', day: 'numeric', month: 'short' })}
                                     </h3>
-                                    <span className="text-xs font-mono text-white/70 bg-white/5 px-2 py-0.5 rounded">Total: {formatCurrency(dayTotal)}</span>
+                                    <span className="text-[10px] font-mono text-textMuted/60">Total: {formatCurrency(dayTotal)}</span>
                                 </div>
 
-                                <div className="space-y-3 overflow-hidden">
+                                <div className="space-y-3">
                                     {grouped[date].map((expense: Expense) => {
                                         const iconName = expense.category?.icon || "MoreHorizontal";
                                         const Icon = ICONS[iconName] || MoreHorizontal;
@@ -121,25 +125,25 @@ export default function HistoryPage() {
                                                     </button>
                                                 </div>
 
-                                                {/* Content Layer (Foreground) */}
+                                                {/* Content Layer (Foreground) - Matches RecentTransactions Style */}
                                                 <motion.div
                                                     drag="x"
                                                     dragConstraints={{ left: -80, right: 0 }}
                                                     dragElastic={0.1}
                                                     whileDrag={{ scale: 0.98 }}
-                                                    className="relative z-10 p-4 rounded-2xl bg-[#090909] border border-white/5 flex items-center justify-between touch-pan-y will-change-transform"
+                                                    className="relative z-10 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] flex items-center justify-between touch-pan-y will-change-transform backdrop-blur-sm transition-colors duration-300"
                                                 >
                                                     <div className="flex items-center gap-4 pointer-events-none">
-                                                        <div className="w-10 h-10 rounded-xl bg-surface border border-white/5 flex items-center justify-center text-primary/80 shadow-[0_0_10px_rgba(0,0,0,0.3)]">
-                                                            <Icon size={18} />
+                                                        <div className="w-12 h-12 rounded-2xl bg-surface border border-white/5 flex items-center justify-center text-secondary shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+                                                            <Icon size={20} className="drop-shadow-[0_0_5px_rgba(0,224,255,0.4)]" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-heading font-medium text-white text-sm tracking-tight">{expense.category?.name || "Uncategorized"}</p>
-                                                            <p className="text-[10px] text-textMuted mt-0.5">{expense.note || expense.payment_method}</p>
+                                                            <p className="font-heading font-medium text-white text-base tracking-tight">{expense.category?.name || "Uncategorized"}</p>
+                                                            <p className="text-xs text-textMuted mt-0.5">{expense.note || expense.payment_method}</p>
                                                         </div>
                                                     </div>
                                                     <div className="text-right pointer-events-none">
-                                                        <span className="font-bold font-heading text-white text-sm">-{formatCurrency(expense.amount)}</span>
+                                                        <span className="font-bold font-heading text-white text-base">-{formatCurrency(expense.amount)}</span>
                                                         <p className="text-[10px] text-textMuted mt-0.5 font-mono opacity-50">
                                                             {new Date(expense.date).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' })}
                                                         </p>
