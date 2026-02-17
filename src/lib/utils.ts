@@ -23,3 +23,20 @@ export function groupExpensesByDate(expenses: any[]) {
         return groups;
     }, {} as Record<string, any[]>);
 }
+
+export function groupExpensesByYearMonth(expenses: any[]) {
+    return expenses.reduce((structure, expense) => {
+        const date = new Date(expense.date);
+        const year = date.getFullYear().toString();
+        const month = date.toLocaleString('default', { month: 'long' });
+
+        if (!structure[year]) {
+            structure[year] = {};
+        }
+        if (!structure[year][month]) {
+            structure[year][month] = [];
+        }
+        structure[year][month].push(expense);
+        return structure; // Ensure we return the accumulator
+    }, {} as Record<string, Record<string, any[]>>);
+}
