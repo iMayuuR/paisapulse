@@ -12,12 +12,12 @@ import { useRouter } from "next/navigation";
 export default function SettingsPage() {
     const router = useRouter();
     const [budget, setBudget] = useState("20000");
-    const [username, setUsername] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [displayName, setDisplayName] = useState("");
+    const [loading, setLoading] = useState(true); // Fix: Start as true to prevent flash
 
     // Edit Modes
     const [isEditingBudget, setIsEditingBudget] = useState(false);
-    const [isEditingUsername, setIsEditingUsername] = useState(false);
+    const [isEditingName, setIsEditingName] = useState(false);
     const [saving, setSaving] = useState(false);
 
     const [userId, setUserId] = useState<string | null>(null);
@@ -25,30 +25,28 @@ export default function SettingsPage() {
 
     useEffect(() => {
         const fetchSettings = async () => {
-            setLoading(true);
+            // setLoading(true); // Already true
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 router.push("/login");
                 return;
             }
             setUserId(user.id);
-            setUsername(user.email?.split("@")[0] || "User");
+            setDisplayName(user.email?.split("@")[0] || "User");
 
-            // Fetch Settings (Budget & Username)
+            // Fetch Settings (Budget & Display Name)
             const { data: settings } = await supabase
                 .from('user_settings')
-                .select('monthly_limit, username')
+                .select('monthly_limit, display_name')
                 .eq('user_id', user.id)
                 .single();
 
             if (settings) {
                 setBudget(settings.monthly_limit.toString());
-                if (settings.username) setUsername(settings.username);
+                if (settings.display_name) setDisplayName(settings.display_name);
             }
 
             // Fetch Expenses for History
-            // Fetching all expenses might be heavy, in real app use RPC or aggregate query.
-            // For now, client-side aggregation is fine for MVP.
             const { data: expenses } = await supabase
                 .from('expenses')
                 .select('amount, date')
@@ -63,7 +61,6 @@ export default function SettingsPage() {
                     statsMap.set(key, (statsMap.get(key) || 0) + Number(exp.amount));
                 });
 
-                // Sort by date (implied by insertion order of keys if iterated chronologically, but better to force recent)
                 const statsArray = Array.from(statsMap.entries()).map(([month, total]) => ({ month, total }));
                 setMonthlyStats(statsArray.slice(0, 5));
             }
@@ -93,53 +90,43 @@ export default function SettingsPage() {
         setSaving(false);
     };
 
-    const handleSaveUsername = async () => {
+    const handleSaveName = async () => {
         if (!userId) return;
-        if (!username.trim()) {
-            alert("Username cannot be empty");
+        if (!displayName.trim()) {
+            alert("Display name cannot be empty");
             return;
         }
         setSaving(true);
-
-        // Check uniqueness
-        const { data: existing } = await supabase
-            .from('user_settings')
-            .select('user_id')
-            .eq('username', username)
-            .neq('user_id', userId) // Exclude self
-            .single();
-
-        if (existing) {
-            alert("Username already taken!");
-            setSaving(false);
-            return;
-        }
 
         const { error } = await supabase
             .from('user_settings')
             .upsert({
                 user_id: userId,
-                username: username.trim(),
+                display_name: displayName.trim(),
                 updated_at: new Date().toISOString()
             }, { onConflict: 'user_id' });
 
         if (error) {
-            if (error.code === '23505') {
-                alert("Username already taken! (Database)");
-            } else {
-                console.error("Error saving username:", error);
-                alert("Failed to save username");
-            }
+            console.error("Error saving name:", error);
+            alert("Failed to save name");
         } else {
-            setIsEditingUsername(false);
+            setIsEditingName(false);
         }
         setSaving(false);
     };
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        router.push("/login");
+        router.push("/login"); // Fixed route
     };
+
+    if (loading) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-6 pt-4 pb-20 fade-in">
@@ -157,30 +144,30 @@ export default function SettingsPage() {
                             <User size={20} />
                         </div>
                         <div className="flex-1">
-                            <label className="text-[10px] text-textMuted uppercase tracking-wider">Username</label>
-                            {isEditingUsername ? (
+                            <label className="text-[10px] text-textMuted uppercase tracking-wider">Display Name</label>
+                            {isEditingName ? (
                                 <Input
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
+                                    value={displayName}
+                                    onChange={(e) => setDisplayName(e.target.value)}
                                     className="h-8 bg-black/20 border-primary/50 text-sm"
                                     autoFocus
                                 />
                             ) : (
-                                <p className="text-sm font-medium text-white">{username}</p>
+                                <p className="text-sm font-medium text-white">{displayName}</p>
                             )}
                         </div>
                     </div>
-                    {isEditingUsername ? (
+                    {isEditingName ? (
                         <div className="flex gap-2">
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-danger hover:bg-danger/10" onClick={() => setIsEditingUsername(false)}>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-danger hover:bg-danger/10" onClick={() => setIsEditingName(false)}>
                                 <X size={16} />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={handleSaveUsername} isLoading={saving}>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={handleSaveName} isLoading={saving}>
                                 <Check size={16} />
                             </Button>
                         </div>
                     ) : (
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-textMuted hover:text-white" onClick={() => setIsEditingUsername(true)}>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-textMuted hover:text-white" onClick={() => setIsEditingName(true)}>
                             <Edit2 size={16} />
                         </Button>
                     )}
@@ -275,7 +262,7 @@ export default function SettingsPage() {
                     Sign Out
                 </Button>
                 <p className="text-[10px] text-center text-textMuted mt-4 opacity-50">
-                    PaisaPulse v1.1.0 (Beta)
+                    PaisaPulse v1.2.0
                 </p>
             </section>
         </div>

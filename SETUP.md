@@ -69,7 +69,7 @@ using (auth.uid() = user_id);
 create table if not exists public.user_settings (
   user_id uuid references auth.users not null primary key,
   monthly_limit numeric default 20000,
-  username text unique,
+  display_name text,
   currency text default 'INR',
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
