@@ -124,8 +124,12 @@ export default function SettingsPage() {
             }, { onConflict: 'user_id' });
 
         if (error) {
-            console.error("Error saving username:", error);
-            alert("Failed to save username");
+            if (error.code === '23505') {
+                alert("Username already taken! (Database)");
+            } else {
+                console.error("Error saving username:", error);
+                alert("Failed to save username");
+            }
         } else {
             setIsEditingUsername(false);
         }
