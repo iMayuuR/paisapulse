@@ -6,12 +6,15 @@ export interface Category {
     icon: string;
     color?: string;
     is_default: boolean;
+    type?: "income" | "expense" | "savings";
+    group?: string;
 }
 
-export interface Expense {
+export interface Transaction {
     id: string;
     user_id: string;
     amount: number;
+    type: "income" | "expense" | "savings";
     category: Category; // Stored as JSONB
     note?: string;
     payment_method: PaymentMethod;
@@ -24,4 +27,5 @@ export interface BudgetSettings {
     user_id: string;
     monthly_limit: number;
     currency: string;
+    category_limits?: Record<string, number>; // JSONB map of groupName -> limit
 }

@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { formatCurrency, groupExpensesByYearMonth } from "@/lib/utils";
-import { Expense } from "@/types";
+import { formatCurrency, groupTransactionsByYearMonth, cn } from "@/lib/utils";
+import { Transaction } from "@/types";
 import { Coffee, ShoppingBag, Car, Zap, Home, MoreHorizontal, Loader2, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
@@ -15,7 +15,7 @@ const ICONS: Record<string, any> = {
 
 export default function HistoryPage() {
     const router = useRouter();
-    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Deletion State
@@ -41,7 +41,7 @@ export default function HistoryPage() {
                 .order("created_at", { ascending: false });
 
             if (!error && data) {
-                setExpenses(data);
+                setTransactions(data);
                 // Auto-expand the most recent year and month
                 if (data.length > 0) {
                     const firstDate = new Date(data[0].date);
@@ -58,19 +58,19 @@ export default function HistoryPage() {
     const handleDelete = async () => {
         if (!deleteId) return;
 
-        const previous = [...expenses];
-        setExpenses(prev => prev.filter(e => e.id !== deleteId));
+        const previous = [...transactions];
+        setTransactions(prev => prev.filter(e => e.id !== deleteId));
 
         const { error } = await supabase.from('expenses').delete().eq('id', deleteId);
 
         if (error) {
             console.error("Delete failed:", error);
-            setExpenses(previous);
+            setTransactions(previous);
             alert("Failed to delete transaction.");
         }
     };
 
-    const groupedData = groupExpensesByYearMonth(expenses);
+    const groupedData = groupTransactionsByYearMonth(transactions);
     const years = Object.keys(groupedData).sort((a, b) => Number(b) - Number(a));
 
     if (loading) {
@@ -91,7 +91,7 @@ export default function HistoryPage() {
                 </div>
 
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full">
-                    <span className="text-xs font-mono text-primary">{expenses.length} Records</span>
+                    <span className="text-xs font-mono text-primary">{transactions.length} Records</span>
                 </div>
             </header>
 
@@ -149,17 +149,17 @@ export default function HistoryPage() {
                                                             exit={{ height: 0, opacity: 0 }}
                                                             className="overflow-hidden space-y-3 pt-1"
                                                         >
-                                                            {groupedData[year][month].map((expense: any) => {
-                                                                const iconName = expense.category?.icon || "MoreHorizontal";
+                                                            {groupedData[year][month].map((transaction: any) => {
+                                                                const iconName = transaction.category?.icon || "MoreHorizontal";
                                                                 const Icon = ICONS[iconName] || MoreHorizontal;
 
                                                                 return (
-                                                                    <div key={expense.id} className="relative group px-1">
+                                                                    <div key={transaction.id} className="relative group px-1">
                                                                         {/* Actions Layer (Delete) - Always Visible */}
                                                                         <div className="absolute inset-y-0 right-0 w-24 flex items-center justify-end pr-4">
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    setDeleteId(expense.id);
+                                                                                    setDeleteId(transaction.id);
                                                                                     setShowConfirm(true);
                                                                                 }}
                                                                                 className="w-10 h-10 rounded-full bg-danger/20 text-danger flex items-center justify-center border border-danger/50 shadow-[0_0_15px_rgba(255,46,46,0.3)] hover:scale-110 transition-transform z-0"
@@ -182,16 +182,22 @@ export default function HistoryPage() {
                                                                                     <Icon size={18} className="drop-shadow-[0_0_5px_rgba(0,224,255,0.4)]" />
                                                                                 </div>
                                                                                 <div>
-                                                                                    <p className="font-heading font-medium text-white text-sm tracking-tight">{expense.category?.name || "Uncategorized"}</p>
+                                                                                    <p className="font-heading font-medium text-white text-sm tracking-tight">{transaction.category?.name || "Uncategorized"}</p>
                                                                                     <div className="flex items-center gap-2 text-[10px] text-textMuted mt-0.5">
-                                                                                        <span>{new Date(expense.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}</span>
+                                                                                        <span>{new Date(transaction.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}</span>
                                                                                         <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                                                                                        <span>{expense.note || expense.payment_method}</span>
+                                                                                        <span>{transaction.note || transaction.payment_method}</span>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                             <div className="text-right pointer-events-none">
-                                                                                <span className="font-bold font-heading text-white text-base">-{formatCurrency(expense.amount)}</span>
+                                                                                <span className={cn(
+                                                                                    "font-bold font-heading text-base",
+                                                                                    transaction.type === 'income' ? 'text-green-500' : 'text-white'
+                                                                                )}>
+                                                                                    {transaction.type === 'income' ? '+' : '-'}
+                                                                                    {formatCurrency(transaction.amount)}
+                                                                                </span>
                                                                             </div>
                                                                         </motion.div>
                                                                     </div>

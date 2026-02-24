@@ -13,20 +13,20 @@ export function formatCurrency(amount: number) {
     }).format(amount);
 }
 
-export function groupExpensesByDate(expenses: any[]) {
-    return expenses.reduce((groups, expense) => {
-        const date = expense.date.split("T")[0];
+export function groupTransactionsByDate(transactions: any[]) {
+    return transactions.reduce((groups, transaction) => {
+        const date = transaction.date.split("T")[0];
         if (!groups[date]) {
             groups[date] = [];
         }
-        groups[date].push(expense);
+        groups[date].push(transaction);
         return groups;
     }, {} as Record<string, any[]>);
 }
 
-export function groupExpensesByYearMonth(expenses: any[]) {
-    return expenses.reduce((structure, expense) => {
-        const date = new Date(expense.date);
+export function groupTransactionsByYearMonth(transactions: any[]) {
+    return transactions.reduce((structure, transaction) => {
+        const date = new Date(transaction.date);
         const year = date.getFullYear().toString();
         const month = date.toLocaleString('default', { month: 'long' });
 
@@ -36,7 +36,7 @@ export function groupExpensesByYearMonth(expenses: any[]) {
         if (!structure[year][month]) {
             structure[year][month] = [];
         }
-        structure[year][month].push(expense);
+        structure[year][month].push(transaction);
         return structure; // Ensure we return the accumulator
     }, {} as Record<string, Record<string, any[]>>);
 }

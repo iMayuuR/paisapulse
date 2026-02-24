@@ -1,6 +1,6 @@
 "use client";
 
-import { Expense } from "@/types";
+import { Transaction } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { ShoppingBag, Coffee, Car, Home, Zap, CreditCard, IndianRupee, ArrowUpRight, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -18,38 +18,38 @@ const CategoryIcons: Record<string, any> = {
 };
 
 interface RecentTransactionsProps {
-    expenses: Expense[];
+    transactions: Transaction[];
     onTransactionDeleted?: (id: string) => void;
 }
 
-export function RecentTransactions({ expenses, onTransactionDeleted }: RecentTransactionsProps) {
-    const [sortedExpenses, setSortedExpenses] = useState<Expense[]>([]);
+export function RecentTransactions({ transactions, onTransactionDeleted }: RecentTransactionsProps) {
+    const [sortedTransactions, setSortedTransactions] = useState<Transaction[]>([]);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [showConfirm, setShowConfirm] = useState(false);
 
     // Sort logic
     useEffect(() => {
-        setSortedExpenses([...expenses].sort((a, b) => {
+        setSortedTransactions([...transactions].sort((a, b) => {
             const dateA = new Date(a.date).getTime();
             const dateB = new Date(b.date).getTime();
             if (dateA !== dateB) return dateB - dateA;
             return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
         }));
-    }, [expenses]);
+    }, [transactions]);
 
     const handleDelete = async () => {
         if (!deleteId) return;
 
         // Optimistic UI Update
-        const previous = [...sortedExpenses];
-        setSortedExpenses(prev => prev.filter(e => e.id !== deleteId));
+        const previous = [...sortedTransactions];
+        setSortedTransactions(prev => prev.filter(e => e.id !== deleteId));
 
         const { error } = await supabase.from('expenses').delete().eq('id', deleteId);
 
         if (error) {
             console.error("Delete failed:", error);
             // Revert on error
-            setSortedExpenses(previous);
+            setSortedTransactions(previous);
             alert("Failed to delete transaction.");
         } else {
             // Success: Notify parent
@@ -66,22 +66,22 @@ export function RecentTransactions({ expenses, onTransactionDeleted }: RecentTra
                     <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider">Recent Activity</h2>
                 </header>
 
-                {sortedExpenses.length === 0 ? (
+                {sortedTransactions.length === 0 ? (
                     <div className="text-center py-10 opacity-50">
                         <p className="text-sm text-textMuted">No transactions yet</p>
                     </div>
                 ) : (
                     <div className="space-y-3 overflow-hidden">
-                        {sortedExpenses.map((expense) => {
-                            const Icon = CategoryIcons[expense.category.name] || CategoryIcons.Default;
+                        {sortedTransactions.map((transaction) => {
+                            const Icon = CategoryIcons[transaction.category.name] || CategoryIcons.Default;
 
                             return (
-                                <div key={expense.id} className="relative group">
+                                <div key={transaction.id} className="relative group">
                                     {/* Actions Layer (Behind) */}
                                     <div className="absolute inset-y-0 right-0 w-24 flex items-center justify-end pr-4">
                                         <button
                                             onClick={() => {
-                                                setDeleteId(expense.id);
+                                                setDeleteId(transaction.id);
                                                 setShowConfirm(true);
                                             }}
                                             className="w-10 h-10 rounded-full bg-danger/20 text-danger flex items-center justify-center border border-danger/50 shadow-[0_0_15px_rgba(255,46,46,0.3)] hover:scale-110 transition-transform z-0"
@@ -104,14 +104,16 @@ export function RecentTransactions({ expenses, onTransactionDeleted }: RecentTra
                                                 <Icon size={20} className="drop-shadow-[0_0_5px_rgba(0,224,255,0.4)]" />
                                             </div>
                                             <div>
-                                                <p className="font-heading font-medium text-white text-base tracking-tight">{expense.category.name}</p>
-                                                <p className="text-xs text-textMuted mt-0.5">{expense.note || expense.payment_method}</p>
+                                                <p className="font-heading font-medium text-white text-base tracking-tight">{transaction.category.name}</p>
+                                                <p className="text-xs text-textMuted mt-0.5">{transaction.note || transaction.payment_method}</p>
                                             </div>
                                         </div>
                                         <div className="text-right pointer-events-none">
-                                            <p className="font-bold font-heading text-white text-base">-{formatCurrency(expense.amount)}</p>
+                                            <p className="font-bold font-heading text-white text-base">
+                                                {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
+                                            </p>
                                             <p className="text-[10px] text-textMuted mt-0.5 font-mono opacity-60">
-                                                {new Date(expense.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}
+                                                {new Date(transaction.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}
                                             </p>
                                         </div>
                                     </motion.div>

@@ -6,14 +6,20 @@ import { motion } from "framer-motion";
 import { Wallet, TrendingUp, AlertCircle } from "lucide-react";
 
 interface BudgetOverviewProps {
-    budget: number;
     spent: number;
+    income: number;
+    budget?: number;
 }
 
-export function BudgetOverview({ budget, spent }: BudgetOverviewProps) {
-    const remaining = budget - spent;
-    const percentage = Math.min((spent / budget) * 100, 100);
-    const isOverBudget = spent > budget;
+export function BudgetOverview({ spent, income, budget }: BudgetOverviewProps) {
+    // Actually compute net balance (Refunds perfectly cancel out mathematically)
+    const netBalance = income - spent;
+
+    // Calculate percentage based on income
+    const safeIncome = income > 0 ? income : 1; // Avoid division by zero
+    const rawPercentage = (Math.max(0, spent) / safeIncome) * 100;
+    const percentage = Math.max(0, Math.min(rawPercentage, 100));
+    const isOverBudget = spent > income;
 
     return (
         <div className="relative group perspective-1000">
@@ -30,7 +36,7 @@ export function BudgetOverview({ budget, spent }: BudgetOverviewProps) {
                     <div className="flex justify-between items-start">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5 backdrop-blur-sm">
                             <Wallet size={14} className="text-secondary" />
-                            <span className="text-[10px] font-medium tracking-wider text-textMuted uppercase">Monthly Budget</span>
+                            <span className="text-[10px] font-medium tracking-wider text-textMuted uppercase">Monthly Cashflow</span>
                         </div>
                         <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
                             <div className="w-full h-full rounded-full bg-[url('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix')] bg-cover" />
@@ -38,22 +44,36 @@ export function BudgetOverview({ budget, spent }: BudgetOverviewProps) {
                     </div>
 
                     <div className="space-y-1">
-                        <h3 className="text-textMuted text-sm font-medium">Remaining Balance</h3>
-                        <div className="flex items-baseline gap-2">
-                            <h1 className={`text-4xl font-heading font-bold tracking-tight ${isOverBudget ? "text-danger drop-shadow-[0_0_10px_rgba(255,46,46,0.5)]" : "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"}`}>
-                                {formatCurrency(remaining)}
-                            </h1>
-                            <span className="text-xs text-textMuted">/ {formatCurrency(budget)}</span>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <h3 className="text-textMuted text-sm font-medium">Net Balance</h3>
+                                <div className="flex items-baseline gap-2">
+                                    <h1 className={`text-4xl font-heading font-bold tracking-tight ${netBalance < 0 ? "text-danger drop-shadow-[0_0_10px_rgba(255,46,46,0.5)]" : "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"}`}>
+                                        {formatCurrency(netBalance)}
+                                    </h1>
+                                </div>
+                            </div>
+                            <div className="text-right pb-1">
+                                <span className="text-xs text-textMuted uppercase tracking-wider block">Total Income</span>
+                                <span className="text-base font-bold text-green-500">+{formatCurrency(income)}</span>
+                            </div>
                         </div>
+                        {budget ? (
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] text-textMuted uppercase tracking-wider bg-white/5 border border-white/5 px-2 py-0.5 rounded-full">
+                                    Budget Limit: <span className="text-white/90 font-semibold">{formatCurrency(budget)}</span>
+                                </span>
+                            </div>
+                        ) : null}
                     </div>
 
                     <div className="space-y-3">
                         <div className="flex justify-between text-xs font-medium">
                             <div className="flex items-center gap-1.5 text-textMuted">
                                 <div className={`w-1.5 h-1.5 rounded-full ${isOverBudget ? "bg-danger animate-pulse" : "bg-success"}`} />
-                                {Math.round(percentage)}% Used
+                                {income <= 0 ? (spent <= 0 ? "No Active Expenses" : "No Income Logged") : `${Math.round(rawPercentage)}% of Income Spent`}
                             </div>
-                            <span className="text-white">{formatCurrency(spent)} Spent</span>
+                            <span className="text-white">{spent < 0 ? `+${formatCurrency(Math.abs(spent))} Net Refund` : `${formatCurrency(spent)} Spent`}</span>
                         </div>
 
                         {/* Progress Bar with Glow */}

@@ -6,13 +6,14 @@ import { supabase } from "@/lib/supabase";
 import { CategoryPieChart } from "@/components/analytics/CategoryPieChart";
 import { DailyTrendChart } from "@/components/analytics/DailyTrendChart";
 import { Card } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
-import { Expense } from "@/types";
+import { formatCurrency, cn } from "@/lib/utils";
+import { Transaction } from "@/types";
 import { Loader2 } from "lucide-react";
 
 export default function AnalyticsPage() {
     const router = useRouter();
-    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [categoryLimits, setCategoryLimits] = useState<Record<string, number>>({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,13 +24,24 @@ export default function AnalyticsPage() {
                 return;
             }
 
-            const { data, error } = await supabase
+            const { data: expensesData, error: expensesError } = await supabase
                 .from("expenses")
                 .select("*");
 
-            if (!error && data) {
-                setExpenses(data);
+            if (!expensesError && expensesData) {
+                setTransactions(expensesData);
             }
+
+            const { data: settingsData } = await supabase
+                .from("user_settings")
+                .select("category_limits")
+                .eq("user_id", user.id)
+                .single();
+
+            if (settingsData?.category_limits) {
+                setCategoryLimits(settingsData.category_limits);
+            }
+
             setLoading(false);
         };
 
@@ -37,36 +49,43 @@ export default function AnalyticsPage() {
     }, [router]);
 
     // Process Data
-    const totalSpent = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
+    const totalSpent = transactions
+        .filter(t => t.type !== 'income')
+        .reduce((acc, curr) => acc + Number(curr.amount), 0);
 
-    // 1. Category Pie Data
+    const totalIncome = transactions
+        .filter(t => t.type === 'income')
+        .reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+    // 1. Category Pie Data (Only for expenses, grouped by category group)
     const categoryMap = new Map<string, number>();
-    expenses.forEach(exp => {
-        const catName = exp.category?.name || "Other";
+    transactions.filter(t => t.type !== 'income').forEach(exp => {
+        // Fallback to name if group is not defined (for older transactions)
+        const groupName = exp.category?.group || exp.category?.name || "Other";
         const amount = Number(exp.amount);
-        categoryMap.set(catName, (categoryMap.get(catName) || 0) + amount);
+        categoryMap.set(groupName, (categoryMap.get(groupName) || 0) + amount);
     });
 
     const PIE_DATA = Array.from(categoryMap.entries())
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value);
 
-    // 2. Daily Trend Data (Last 7 days or all time sorted)
+    // 2. Daily Trend Data (Net: Income - Expenses per day)
     const dateMap = new Map<string, number>();
-    expenses.forEach(exp => {
+    transactions.forEach(exp => {
         const dateKey = new Date(exp.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' });
-        const amount = Number(exp.amount);
+        const amount = Number(exp.amount) * (exp.type === 'income' ? 1 : -1);
         dateMap.set(dateKey, (dateMap.get(dateKey) || 0) + amount);
     });
 
     // Sort by date (naive approach for now, relies on formatted string which isn't ideal for sorting but works if we sort expenses first)
     // Better: create array of last 7 days and fill
     // For MVP: Just showing existing data points sorted by date
-    const sortedExpenses = [...expenses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     const sortedDateMap = new Map<string, number>();
-    sortedExpenses.forEach(exp => {
+    sortedTransactions.forEach(exp => {
         const dateKey = new Date(exp.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' });
-        const amount = Number(exp.amount);
+        const amount = Number(exp.amount) * (exp.type === 'income' ? 1 : -1);
         sortedDateMap.set(dateKey, (sortedDateMap.get(dateKey) || 0) + amount);
     });
 
@@ -88,9 +107,15 @@ export default function AnalyticsPage() {
             </header>
 
             <Card className="bg-gradient-to-br from-surface to-black border-white/5">
-                <div className="text-center py-4">
-                    <span className="text-textMuted text-xs uppercase tracking-wide">Total Spent</span>
-                    <h2 className="text-3xl font-bold text-white mt-1">{formatCurrency(totalSpent)}</h2>
+                <div className="flex divide-x divide-white/5 py-4">
+                    <div className="flex-1 text-center">
+                        <span className="text-textMuted text-xs uppercase tracking-wide">Total Income</span>
+                        <h2 className="text-2xl font-bold text-green-500 mt-1">{formatCurrency(totalIncome)}</h2>
+                    </div>
+                    <div className="flex-1 text-center">
+                        <span className="text-textMuted text-xs uppercase tracking-wide">Total Spent</span>
+                        <h2 className="text-2xl font-bold text-danger mt-1">{formatCurrency(totalSpent)}</h2>
+                    </div>
                 </div>
             </Card>
 
@@ -104,6 +129,39 @@ export default function AnalyticsPage() {
                     )}
                 </Card>
             </div>
+
+            {/* Budget Usage Section (Only show if at least one limit is set) */}
+            {Object.keys(categoryLimits).length > 0 && (
+                <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-white px-1">Budget Usage</h3>
+                    <Card className="p-4 border-white/5 space-y-4">
+                        {Object.entries(categoryLimits).map(([group, limit]) => {
+                            if (!limit || limit <= 0) return null;
+                            const spent = categoryMap.get(group) || 0;
+                            const percentage = Math.min((spent / limit) * 100, 100);
+                            const isOver = spent > limit;
+
+                            return (
+                                <div key={group} className="space-y-1.5">
+                                    <div className="flex justify-between items-end text-sm">
+                                        <span className="text-white/80 font-medium">{group}</span>
+                                        <span className="text-xs text-textMuted text-right">
+                                            <span className={isOver ? "text-danger" : "text-white"}>{formatCurrency(spent)}</span> / {formatCurrency(limit)}
+                                        </span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div
+                                            className={cn("h-full rounded-full transition-all duration-1000", isOver ? "bg-danger" : percentage > 85 ? "bg-secondary" : "bg-primary")}
+                                            style={{ width: `${percentage}%` }}
+                                        />
+                                    </div>
+                                    {isOver && <p className="text-[10px] text-danger/80">Over budget by {formatCurrency(spent - limit)}</p>}
+                                </div>
+                            );
+                        })}
+                    </Card>
+                </div>
+            )}
 
             <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-white px-1">Daily Trend</h3>

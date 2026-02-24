@@ -1,0 +1,184 @@
+Personal Budget Spreadsheet             by Vertex42.com
+Personal Budget Spreadsheet
+Starting Balance1,000                       [42]  Total Avg   © 2008-2019 Vertex42 LLC
+Total Income 0  0  0  0  0  0  0  0  0  0  0  0   0   0   Additional Templates
+Total Expenses 0  0  0  0  0  0  0  0  0  0  0  0   0   0   ► Budget Templates
+NET (Income - Expenses)0  0  0  0  0  0  0  0  0  0  0  0   0   0   ► Home & Family Templates
+Projected End Balance1,0001,0001,0001,0001,0001,0001,0001,0001,0001,0001,0001,000          ► Money Manager Template
+JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC  TotalAverage   To Print: Hide this column first
+INCOME
+Wages & Tips                                   0   0
+Interest Income                                 0   0
+Dividends                                    0   0
+Gifts Received                                  0   0
+Refunds/Reimbursements [1]                              0   0
+Transfer From Savings                               0   0
+Other                                     0   0
+Other                                     0   0
+Total INCOME  0  0  0  0  0  0  0  0  0  0  0  0   0   0
+SAVINGS
+Emergency Fund                                  0   0
+Transfer to Savings                                0   0
+Retirement (401k, IRA)                               0   0
+Investments                                   0   0
+Education                                    0   0
+Other                                     0   0
+Total SAVINGS 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+HOME EXPENSES
+Mortgage/Rent                                  0   0
+Home/Rental Insurance                               0   0
+Electricity                                   0   0
+Gas/Oil                                     0   0
+Water/Sewer/Trash                                 0   0
+Phone                                     0   0
+Cable/Satellite                                 0   0
+Internet                                     0   0
+Furnishings/Appliances                               0   0
+Lawn/Garden                                   0   0
+Maintenance/Supplies                                0   0
+Improvements                                   0   0
+Other                                     0   0
+Total HOME EXPENSES 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+TRANSPORTATION
+Vehicle Payments                                 0   0
+Auto Insurance                                  0   0
+Fuel                                      0   0
+Bus/Taxi/Train Fare                                0   0
+Repairs                                     0   0
+Registration/License                                0   0
+Other                                     0   0
+Total TRANSPORTATION  0  0  0  0  0  0  0  0  0  0  0  0   0   0
+HEALTH
+Health Insurance                                 0   0
+Doctor/Dentist                                  0   0
+Medicine/Drugs                                  0   0
+Health Club Dues                                 0   0
+Life Insurance                                  0   0
+Veterinarian/Pet Care                               0   0
+Other                                     0   0
+Total HEALTH  0  0  0  0  0  0  0  0  0  0  0  0   0   0
+CHARITY/GIFTS
+Gifts Given                                   0   0
+Charitable Donations                                0   0
+Religious Donations                                0   0
+----------------Page (0) Break----------------
+Personal Budget Spreadsheet             by Vertex42.com
+Personal Budget Spreadsheet
+Starting Balance1,000                       [42]  Total Avg   © 2008-2019 Vertex42 LLC
+Total Income 0  0  0  0  0  0  0  0  0  0  0  0   0   0   Additional Templates
+Total Expenses 0  0  0  0  0  0  0  0  0  0  0  0   0   0   ► Budget Templates
+NET (Income - Expenses)0  0  0  0  0  0  0  0  0  0  0  0   0   0   ► Home & Family Templates
+Projected End Balance1,0001,0001,0001,0001,0001,0001,0001,0001,0001,0001,0001,000          ► Money Manager Template
+JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC  TotalAverage   To Print: Hide this column first
+Other                                     0   0
+Total CHARITY/GIFTS 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+DAILY LIVING
+Groceries                                    0   0
+Personal Supplies                                 0   0
+Clothing                                     0   0
+Cleaning                                     0   0
+Education/Lessons                                 0   0
+Dining/Eating Out                                 0   0
+Salon/Barber                                   0   0
+Pet Food                                     0   0
+Other                                     0   0
+Total DAILY LIVING 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+ENTERTAINMENT
+Music                                     0   0
+Movies/Theater/Concerts                              0   0
+Books                                     0   0
+Hobbies                                     0   0
+Sports                                     0   0
+Recreation                                    0   0
+Toys/Gadgets/Games                                 0   0
+Vacation/Travel                                 0   0
+Other                                     0   0
+Total ENTERTAINMENT 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+OBLIGATIONS
+Student Loan                                   0   0
+Other Loan                                    0   0
+Credit Card Debt                                 0   0
+Alimony/Child Support                               0   0
+Federal Taxes                                  0   0
+State/Local Taxes                                 0   0
+Other                                     0   0
+Total OBLIGATIONS 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+SUBSCRIPTIONS
+Newspaper                                    0   0
+Magazines                                    0   0
+Dues/Memberships                                 0   0
+Other                                     0   0
+Total SUBSCRIPTIONS 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+[42]
+MISCELLANEOUS
+Bank Fees                                    0   0
+Postage                                     0   0
+Other                                     0   0
+Other                                     0   0
+Total MISCELLANEOUS 0  0  0  0  0  0  0  0  0  0  0  0   0   0
+----------------Page (1) Break----------------
+Help
+https://www.vertex42.com/ExcelTemplates/personal-budget-spreadsheet.html
+© 2008-2019 By Vertex42.com
+About this template
+This personal budget spreadsheet is meant to help you create a budget for an 
+entire year. Doing this will help you make predictions about where you may 
+stand financially in the future. If you are moving, changing jobs, purchasing a 
+home, or making other major life changes, it is essential to plan for many 
+months down the road.
+Instructions
+1) Edit/Create/Delete categories and subcategories
+Use row operations, such as deleting or inserting an entire row. The subtotal 
+formulas are set up to allow this type of editing without messing up the 
+formulas, but you should always insert a row ABOVE the last row in the group 
+or BELOW the first row, so that the formulas stretch to include the row you 
+added.
+2) Verify that all of the subtotal formulas are correctly summing the correct cells
+3) Modify the month headings as needed, to start with a different month
+4) Enter your starting balance at the top of the worksheet.
+5) Fill in the income and expenses for the year
+a. You can copy and paste cells as needed. For example, enter an average fuel 
+cost in Jan, and copy it across through Dec
+b. Include large lump payments in the months in which they will likely occur or 
+use the approach of averaging the cost across each month. When using the 
+averaging approach, consider that your actual balance may not reflect the 
+predicted balance for the month. If you use the lump payment approach, it 
+may be easier to compare actual balances, but make sure you have enough 
+saved.
+c. Add cell comments as needed to help explain costs. For example, you might 
+include the names of Birthdays in comments for the Gifts Given category
+Updating the Balance Each Month
+If your actual balance at the end of a month is substantially different than the 
+projected balance, you may want to overwrite the formula in the "Projected 
+End Balance" with your actual balance, to update the projections for the rest 
+of the year.
+How to Print
+- Select the worksheet tab you'd like to print
+- Make sure to hide any columns you don't want to print
+- Go to File > Print
+Additional Help
+----------------Page (2) Break----------------
+The link at the top of this worksheet will take you to the web page on 
+Vertex42.com that talks about this template.
+Related Templates
+► Money Manager Template
+► Budget Templates
+► Home & Family Templates
+----------------Page (3) Break----------------
+Personal Budget Spreadsheet
+By Vertex42.com
+https://www.vertex42.com/ExcelTemplates/personal-budget-spreadsheet.html
+© 2008-2026 Vertex42 LLC
+This spreadsheet, including all worksheets and associated content is 
+a copyrighted work under the United States and other copyright laws.
+Do not submit copies or modifications of this template to any website 
+or online template gallery.
+Please review the following license agreement to learn how you may 
+or may not use this template. Thank you.
+License Agreement
+https://www.vertex42.com/licensing/EULA_personaluse.html
+Do not delete this worksheet.
+----------------Page (4) Break----------------
+[1] Note: You may want to enter refunds and reimbursements as negative values in a relevant expense 
+category, instead.
+----------------Page (5) Break----------------

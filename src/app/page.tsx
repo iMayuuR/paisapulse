@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
-import { Expense } from "@/types";
+import { Transaction } from "@/types";
 import { Loader2, Edit2, Check, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const router = useRouter();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   // User Name State
@@ -54,7 +54,7 @@ export default function Home() {
       if (expensesError) {
         console.error("Error fetching expenses:", expensesError);
       } else {
-        setExpenses(expensesData || []);
+        setTransactions(expensesData || []);
       }
 
       // 3. Fetch Budget Settings (& Name if available)
@@ -114,10 +114,19 @@ export default function Home() {
     setIsEditingName(true);
   };
 
-  const spent = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const rawIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const rawSpent = transactions.filter(t => t.type !== 'income').reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+  // Smart Math: Refunds offset expenses, rather than inflating total income
+  const refundAmount = transactions
+    .filter(t => t.type === 'income' && t.category?.name?.toLowerCase() === 'refunds')
+    .reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+  const income = rawIncome - refundAmount;
+  const spent = rawSpent - refundAmount;
 
   const handleTransactionDeleted = (deletedId: string) => {
-    setExpenses(prev => prev.filter(e => e.id !== deletedId));
+    setTransactions(prev => prev.filter(e => e.id !== deletedId));
   };
 
   if (loading) {
@@ -161,10 +170,10 @@ export default function Home() {
         </div>
       </header>
 
-      <BudgetOverview budget={budget} spent={spent} />
+      <BudgetOverview spent={spent} income={income} budget={budget} />
 
       <RecentTransactions
-        expenses={expenses.slice(0, 5)}
+        transactions={transactions.slice(0, 5)}
         onTransactionDeleted={handleTransactionDeleted}
       />
     </div>

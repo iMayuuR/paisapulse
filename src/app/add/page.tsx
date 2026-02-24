@@ -10,26 +10,29 @@ import { DEFAULT_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Calendar, Mic } from "lucide-react";
 import Link from "next/link";
-import { PaymentMethod } from "@/types";
+import { PaymentMethod, Category } from "@/types";
 
 export default function AddExpensePage() {
     const router = useRouter();
     const [amount, setAmount] = useState("");
+    const [transactionType, setTransactionType] = useState<"income" | "expense">("expense");
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("UPI");
 
-    // Fix Date Initialization to use Local Time (IST) instead of UTC
-    const [date, setDate] = useState(() => {
+    const [date, setDate] = useState("");
+
+    useEffect(() => {
+        // Set date to local time
         const now = new Date();
         const offset = now.getTimezoneOffset();
         const localDate = new Date(now.getTime() - (offset * 60 * 1000));
-        return localDate.toISOString().split('T')[0];
-    });
+        setDate(localDate.toISOString().split('T')[0]);
+    }, []);
 
     const [note, setNote] = useState("");
-    const [customCategoryName, setCustomCategoryName] = useState("");
     const [customPaymentMethod, setCustomPaymentMethod] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sessionCustomCategories, setSessionCustomCategories] = useState<Category[]>([]);
 
     // Real-time Clock State
     const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -40,8 +43,14 @@ export default function AddExpensePage() {
         return () => clearInterval(timer);
     }, []);
 
-    // Use default categories with IDs
-    const categories = DEFAULT_CATEGORIES.map((cat, index) => ({ ...cat, id: `c-${index}` }));
+    useEffect(() => {
+        setSelectedCategoryId(null);
+    }, [transactionType]);
+
+    // Combine default and custom categories, attach IDs, and filter by type
+    const categories: Category[] = [...DEFAULT_CATEGORIES, ...sessionCustomCategories]
+        .map((cat, index) => ({ ...cat, id: (cat as Category).id || `c-${index}` }))
+        .filter(cat => cat.type === transactionType || !cat.type);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,23 +67,7 @@ export default function AddExpensePage() {
             }
 
             // Determine Category
-            let finalCategory;
-            if (selectedCategoryId === "custom") {
-                if (!customCategoryName.trim()) {
-                    alert("Please enter a custom category name");
-                    setIsSubmitting(false);
-                    return;
-                }
-                finalCategory = {
-                    id: "custom",
-                    name: customCategoryName,
-                    icon: "CircleDashed", // Default icon for custom
-                    is_default: false
-                };
-            } else {
-                finalCategory = categories.find(c => c.id === selectedCategoryId);
-            }
-
+            const finalCategory = categories.find(c => c.id === selectedCategoryId);
             if (!finalCategory) throw new Error("Invalid category");
 
             // Determine Payment Method
@@ -90,7 +83,7 @@ export default function AddExpensePage() {
 
             // Combine selected date with current time
             const now = new Date();
-            const selectedDate = new Date(date);
+            const selectedDate = date ? new Date(date) : now;
 
             // Set time to current time
             selectedDate.setHours(now.getHours());
@@ -101,6 +94,7 @@ export default function AddExpensePage() {
             const { error } = await supabase.from('expenses').insert({
                 user_id: user.id,
                 amount: parseFloat(amount),
+                type: transactionType,
                 category: finalCategory,
                 payment_method: finalPaymentMethod,
                 date: selectedDate.toISOString(),
@@ -132,6 +126,26 @@ export default function AddExpensePage() {
 
             <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-8 px-2 pb-8">
 
+                {/* Type Toggle */}
+                <div className="flex justify-center mt-2">
+                    <div className="bg-black/20 p-1 rounded-2xl flex items-center gap-1 border border-white/10">
+                        <button
+                            type="button"
+                            onClick={() => setTransactionType("expense")}
+                            className={cn("px-6 py-2 rounded-xl text-sm font-bold transition-all duration-300", transactionType === "expense" ? "bg-white text-black shadow-lg" : "text-textMuted hover:text-white")}
+                        >
+                            Expense
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setTransactionType("income")}
+                            className={cn("px-6 py-2 rounded-xl text-sm font-bold transition-all duration-300", transactionType === "income" ? "bg-green-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.3)]" : "text-textMuted hover:text-white")}
+                        >
+                            Income
+                        </button>
+                    </div>
+                </div>
+
                 {/* Massive Amount Input */}
                 <div className="text-center space-y-2 mt-4">
                     <span className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Enter Amount</span>
@@ -158,18 +172,19 @@ export default function AddExpensePage() {
                         categories={categories}
                         selectedId={selectedCategoryId}
                         onSelect={setSelectedCategoryId}
+                        onCreateCustomCategory={(groupName, name) => {
+                            const newCustomCategory: Category = {
+                                id: `custom-${Date.now()}`,
+                                name: name,
+                                icon: "Tag", // Generic custom icon
+                                is_default: false,
+                                type: transactionType,
+                                group: groupName
+                            };
+                            setSessionCustomCategories(prev => [...prev, newCustomCategory]);
+                            setSelectedCategoryId(newCustomCategory.id);
+                        }}
                     />
-
-                    {selectedCategoryId === "custom" && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-300 pt-3 pb-1">
-                            <Input
-                                placeholder="Enter category name (e.g. Gym, Subscription)"
-                                value={customCategoryName}
-                                onChange={(e) => setCustomCategoryName(e.target.value)}
-                                className="bg-surface border-primary/50 text-white placeholder:text-textMuted/50 h-12"
-                            />
-                        </div>
-                    )}
                 </div>
 
                 <div className="space-y-6 bg-white/5 rounded-3xl p-6 border border-white/5 backdrop-blur-sm">
@@ -226,7 +241,7 @@ export default function AddExpensePage() {
                                 <div className="pointer-events-none z-10 flex items-center gap-3 text-textMuted group-hover:text-white transition-colors">
                                     <Calendar size={18} className="text-primary/80" />
                                     <span className="text-base font-medium tracking-wide">
-                                        {new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        {date ? new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "Today"}
                                     </span>
                                 </div>
                             </div>
@@ -244,8 +259,8 @@ export default function AddExpensePage() {
                     </div>
                 </div>
 
-                {/* Spacer for floating button */}
-                <div className="h-48" />
+                {/* Spacer for floating button and bottom nav */}
+                <div className="h-64 sm:h-72" />
 
                 {/* Floating Action Button */}
                 <div className="fixed bottom-32 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">

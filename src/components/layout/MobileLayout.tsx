@@ -2,12 +2,16 @@
 
 import { BottomNav } from "./BottomNav";
 import { AuroraBackground } from "./AuroraBackground";
+import { usePathname } from "next/navigation";
 
 interface MobileLayoutProps {
     children: React.ReactNode;
 }
 
 export function MobileLayout({ children }: MobileLayoutProps) {
+    const pathname = usePathname();
+    const isAuthPage = pathname === "/login";
+
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center relative">
             <AuroraBackground />
@@ -15,7 +19,7 @@ export function MobileLayout({ children }: MobileLayoutProps) {
                 <main className="flex-1 pb-24 p-5 overflow-y-auto no-scrollbar">
                     {children}
                 </main>
-                <BottomNav />
+                {!isAuthPage && <BottomNav />}
             </div>
         </div>
     );
