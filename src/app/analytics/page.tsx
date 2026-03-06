@@ -7,11 +7,14 @@ import { CategoryPieChart } from "@/components/analytics/CategoryPieChart";
 import { DailyTrendChart } from "@/components/analytics/DailyTrendChart";
 import { Card } from "@/components/ui/card";
 import { formatCurrency, cn } from "@/lib/utils";
+import { calculateFinancials } from "@/lib/utils";
+import { useDashboard } from "@/contexts/DashboardContext";
 import { Transaction } from "@/types";
 import { Loader2 } from "lucide-react";
 
 export default function AnalyticsPage() {
     const router = useRouter();
+    const { selectedMonth, selectedYear } = useDashboard();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [categoryLimits, setCategoryLimits] = useState<Record<string, number>>({});
     const [loading, setLoading] = useState(true);
@@ -29,7 +32,11 @@ export default function AnalyticsPage() {
                 .select("*");
 
             if (!expensesError && expensesData) {
-                setTransactions(expensesData);
+                const filtered = expensesData.filter((tx: Transaction) => {
+                    const d = new Date(tx.date);
+                    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+                });
+                setTransactions(filtered);
             }
 
             const { data: settingsData } = await supabase
@@ -46,16 +53,10 @@ export default function AnalyticsPage() {
         };
 
         fetchAnalytics();
-    }, [router]);
+    }, [router, selectedMonth, selectedYear]);
 
     // Process Data
-    const totalSpent = transactions
-        .filter(t => t.type !== 'income')
-        .reduce((acc, curr) => acc + Number(curr.amount), 0);
-
-    const totalIncome = transactions
-        .filter(t => t.type === 'income')
-        .reduce((acc, curr) => acc + Number(curr.amount), 0);
+    const { income: totalIncome, spent: totalSpent } = calculateFinancials(transactions);
 
     // 1. Category Pie Data (Only for expenses, grouped by category group)
     const categoryMap = new Map<string, number>();

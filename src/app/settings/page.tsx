@@ -4,15 +4,83 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { Download, LogOut, ChevronRight, History, Edit2, Check, X, Loader2 } from "lucide-react";
+import { Download, LogOut, ChevronRight, History, Edit2, Check, X, Loader2, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
+import { useDashboard } from "@/contexts/DashboardContext";
 import { DEFAULT_CATEGORIES } from "@/lib/constants";
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const currentYear = new Date().getFullYear();
+// Restrict to past and present years only
+const YEARS = [currentYear - 2, currentYear - 1, currentYear];
+
+// Premium Custom Select Component
+function CustomSelect({ options, value, onChange, placeholder = "Select..." }: { options: { label: string | number, value: string | number }[], value: string | number, onChange: (val: string | number) => void, placeholder?: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const selectedOption = options.find(o => o.value === value);
+
+    return (
+        <div className="relative w-full">
+            <div
+                className="h-10 bg-black/40 border border-white/10 rounded-xl px-4 flex items-center justify-between text-white cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span className="font-medium">{selectedOption ? selectedOption.label : placeholder}</span>
+                <ChevronDown size={16} className={`text-textMuted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            </div>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-40"
+                            onClick={() => setIsOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                            className="absolute top-[calc(100%+8px)] left-0 w-full bg-[#1A1A1A] border border-white/10 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-50 overflow-hidden"
+                        >
+                            <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                {options.map((opt) => (
+                                    <div
+                                        key={opt.value}
+                                        className={`px-4 py-3 cursor-pointer text-sm font-medium transition-colors ${value === opt.value ? 'bg-primary/20 text-primary' : 'text-white hover:bg-white/10'}`}
+                                        onClick={() => {
+                                            onChange(opt.value);
+                                            setIsOpen(false);
+                                        }}
+                                    >
+                                        {opt.label}
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
 
 export default function SettingsPage() {
     const router = useRouter();
+    const { selectedMonth, selectedYear, setDashboardDate } = useDashboard();
+
+    // Local state for the filter before applying
+    const [localMonth, setLocalMonth] = useState(selectedMonth);
+    const [localYear, setLocalYear] = useState(selectedYear);
+    const [isFilterDirty, setIsFilterDirty] = useState(false);
+
     const [budget, setBudget] = useState("20000");
     const [categoryLimits, setCategoryLimits] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
@@ -24,6 +92,13 @@ export default function SettingsPage() {
 
     const [userId, setUserId] = useState<string | null>(null);
     const [monthlyStats, setMonthlyStats] = useState<{ month: string, total: number }[]>([]);
+
+    useEffect(() => {
+        // Sync local state when context changes (e.g., on initial load)
+        setLocalMonth(selectedMonth);
+        setLocalYear(selectedYear);
+        setIsFilterDirty(false);
+    }, [selectedMonth, selectedYear]);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -76,6 +151,21 @@ export default function SettingsPage() {
         };
         fetchSettings();
     }, [router]);
+
+    const handleApplyFilter = () => {
+        setDashboardDate(localMonth, localYear);
+        setIsFilterDirty(false);
+    };
+
+    const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setLocalMonth(Number(e.target.value));
+        setIsFilterDirty(true);
+    };
+
+    const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setLocalYear(Number(e.target.value));
+        setIsFilterDirty(true);
+    };
 
     const handleSaveBudget = async () => {
         if (!userId) return;
@@ -176,6 +266,40 @@ export default function SettingsPage() {
                 <h1 className="text-2xl font-bold text-white">Settings</h1>
                 <p className="text-xs text-textMuted">Preferences & Account</p>
             </header>
+
+            {/* Dashboard View Section */}
+            <section className="space-y-3">
+                <h2 className="text-sm font-semibold text-textMuted uppercase tracking-wider px-1">Global Dashboard View</h2>
+                <Card className="p-4 space-y-4">
+                    <div className="flex gap-4">
+                        <div className="flex-1">
+                            <CustomSelect
+                                value={localMonth}
+                                onChange={(val) => { setLocalMonth(Number(val)); setIsFilterDirty(true); }}
+                                options={MONTHS.map((m, i) => ({ label: m, value: i }))}
+                            />
+                        </div>
+                        <div className="w-32">
+                            <CustomSelect
+                                value={localYear}
+                                onChange={(val) => { setLocalYear(Number(val)); setIsFilterDirty(true); }}
+                                options={YEARS.map(y => ({ label: y, value: y }))}
+                            />
+                        </div>
+                    </div>
+                    {isFilterDirty && (
+                        <Button
+                            className="w-full h-10 font-bold tracking-wide shadow-[0_0_20px_rgba(212,255,0,0.15)] bg-gradient-to-r from-[#D4FF00] to-[#00E0FF] text-black hover:opacity-90 transition-opacity"
+                            onClick={handleApplyFilter}
+                        >
+                            Apply Filter
+                        </Button>
+                    )}
+                    <p className="text-[10px] text-textMuted bg-white/5 p-3 rounded-lg leading-relaxed">
+                        ✨ Controls the data timeframe shown on the Home and Analytics pages. Only past and current years are available.
+                    </p>
+                </Card>
+            </section>
 
             {/* Budget Section */}
             <section className="space-y-3">

@@ -104,7 +104,7 @@ export function RecentTransactions({ transactions, onTransactionDeleted }: Recen
                                                 <Icon size={20} className="drop-shadow-[0_0_5px_rgba(0,224,255,0.4)]" />
                                             </div>
                                             <div>
-                                                <p className="font-heading font-medium text-white text-base tracking-tight">{transaction.category.name}</p>
+                                                <p className="font-heading font-medium text-white text-base tracking-tight">{transaction.category?.name || "Uncategorized"}</p>
                                                 <p className="text-xs text-textMuted mt-0.5">{transaction.note || transaction.payment_method}</p>
                                             </div>
                                         </div>

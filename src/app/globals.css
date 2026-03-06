@@ -106,3 +106,15 @@ h6 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Hide native number input spin buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

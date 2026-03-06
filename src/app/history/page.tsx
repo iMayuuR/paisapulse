@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { formatCurrency, groupTransactionsByYearMonth, cn } from "@/lib/utils";
+import { formatCurrency, groupTransactionsByYearMonth, calculateFinancials, cn } from "@/lib/utils";
 import { Transaction } from "@/types";
 import { Coffee, ShoppingBag, Car, Zap, Home, MoreHorizontal, Loader2, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -134,7 +134,7 @@ export default function HistoryPage() {
                                                     <span className="text-sm font-medium uppercase tracking-widest">{month}</span>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs font-mono text-primary">
-                                                            {formatCurrency(groupedData[year][month].reduce((acc: number, curr: any) => acc + Number(curr.amount), 0))}
+                                                            {formatCurrency(calculateFinancials(groupedData[year][month]).spent)}
                                                         </span>
                                                         {expandedMonth === month ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                                     </div>

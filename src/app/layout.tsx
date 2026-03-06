@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { DashboardProvider } from "@/contexts/DashboardContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -31,9 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} antialiased`} suppressHydrationWarning>
-        <MobileLayout>{children}</MobileLayout>
+        <DashboardProvider>
+          <MobileLayout>{children}</MobileLayout>
+        </DashboardProvider>
       </body>
     </html>
   );

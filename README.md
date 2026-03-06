@@ -18,6 +18,12 @@ A smartphone-first, dark-mode PWA for tracking monthly expenses.
     npm run dev
     ```
 
+## ✨ What's New in v0.2.0
+
+*   **Premium Custom Select UI**: Settings feature fully custom, beautifully animated dropdown components instead of native browser styles.
+*   **Timeframe Context Engine**: Seamless global integration (`DashboardContext`) explicitly filtering dashboard views for designated months and years avoiding total summation confusion.
+*   **Math Normalization**: Total income vs expenses correctly aggregate 'refunds', dynamically adjusting UI counters without breaking balance sheets. 
+
 ## 📱 PWA Setup
 
 - The app is PWA-ready.

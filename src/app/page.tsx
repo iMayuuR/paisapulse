@@ -6,12 +6,16 @@ import { supabase } from "@/lib/supabase";
 import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { Transaction } from "@/types";
-import { Loader2, Edit2, Check, X } from "lucide-react";
+import { Loader2, Edit2, Check, X, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import { useDashboard } from "@/contexts/DashboardContext";
+import { calculateFinancials } from "@/lib/utils";
+
 export default function Home() {
   const router = useRouter();
+  const { selectedMonth, selectedYear, setDashboardDate } = useDashboard();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +48,7 @@ export default function Home() {
         setUserName(emailName);
       }
 
-      // 2. Fetch Expenses
+      // 2. Fetch Expenses (Filter via JS since date is stored as string in DB, or we can filter in DB if we query properly. Let's do JS for flexibility with timezones)
       const { data: expensesData, error: expensesError } = await supabase
         .from("expenses")
         .select("*")
@@ -54,7 +58,12 @@ export default function Home() {
       if (expensesError) {
         console.error("Error fetching expenses:", expensesError);
       } else {
-        setTransactions(expensesData || []);
+        // Filter by selected month/year
+        const filtered = (expensesData || []).filter((tx: Transaction) => {
+          const d = new Date(tx.date);
+          return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+        });
+        setTransactions(filtered);
       }
 
       // 3. Fetch Budget Settings (& Name if available)
@@ -78,7 +87,7 @@ export default function Home() {
     };
 
     fetchData();
-  }, [router]);
+  }, [router, selectedMonth, selectedYear]);
 
   const handleSaveName = async () => {
     if (!tempName.trim()) return setIsEditingName(false);
@@ -114,16 +123,7 @@ export default function Home() {
     setIsEditingName(true);
   };
 
-  const rawIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + Number(curr.amount), 0);
-  const rawSpent = transactions.filter(t => t.type !== 'income').reduce((acc, curr) => acc + Number(curr.amount), 0);
-
-  // Smart Math: Refunds offset expenses, rather than inflating total income
-  const refundAmount = transactions
-    .filter(t => t.type === 'income' && t.category?.name?.toLowerCase() === 'refunds')
-    .reduce((acc, curr) => acc + Number(curr.amount), 0);
-
-  const income = rawIncome - refundAmount;
-  const spent = rawSpent - refundAmount;
+  const { income, spent } = calculateFinancials(transactions);
 
   const handleTransactionDeleted = (deletedId: string) => {
     setTransactions(prev => prev.filter(e => e.id !== deletedId));
@@ -137,10 +137,12 @@ export default function Home() {
     )
   }
 
+  const isCurrentMonth = selectedMonth === new Date().getMonth() && selectedYear === new Date().getFullYear();
+
   return (
-    <div className="space-y-8 pt-6">
-      <header className="flex justify-between items-center px-1">
-        <div>
+    <div className="space-y-8 pt-6 pb-20 fade-in">
+      <header className="flex justify-between items-start px-1">
+        <div className="space-y-1">
           <div className="flex items-center gap-3">
             {isEditingName ? (
               <div className="flex items-center gap-2">
@@ -166,7 +168,24 @@ export default function Home() {
               </h1>
             )}
           </div>
-          <p className="text-xs text-textMuted/80 font-medium tracking-wide uppercase mt-1">Financial Overview</p>
+          {!isCurrentMonth ? (
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary/20 text-secondary border border-secondary/30">
+                Viewing Past Data
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-[10px] text-textMuted hover:text-white px-2 rounded bg-white/5 border border-white/10"
+                onClick={() => setDashboardDate(new Date().getMonth(), new Date().getFullYear())}
+              >
+                <ArrowRight size={12} className="mr-1" />
+                Jump to Current
+              </Button>
+            </div>
+          ) : (
+            <p className="text-xs text-textMuted/80 font-medium tracking-wide uppercase mt-1">Financial Overview</p>
+          )}
         </div>
       </header>
 

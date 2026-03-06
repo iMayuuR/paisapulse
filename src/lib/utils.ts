@@ -40,3 +40,18 @@ export function groupTransactionsByYearMonth(transactions: any[]) {
         return structure; // Ensure we return the accumulator
     }, {} as Record<string, Record<string, any[]>>);
 }
+
+export function calculateFinancials(transactions: import("@/types").Transaction[]) {
+    const rawIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + Number(curr.amount), 0);
+    const rawSpent = transactions.filter(t => t.type !== 'income').reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+    // Smart Math: Refunds offset expenses, rather than inflating total income
+    const refundAmount = transactions
+        .filter(t => t.type === 'income' && t.category?.name?.toLowerCase() === 'refunds')
+        .reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+    const income = rawIncome - refundAmount;
+    const netSpent = rawSpent - refundAmount;
+
+    return { income, spent: netSpent };
+}
