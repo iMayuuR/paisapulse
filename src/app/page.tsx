@@ -189,12 +189,18 @@ export default function Home() {
         </div>
       </header>
 
-      <BudgetOverview spent={spent} income={income} budget={budget} />
-
-      <RecentTransactions
-        transactions={transactions.slice(0, 5)}
-        onTransactionDeleted={handleTransactionDeleted}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+          <BudgetOverview spent={spent} income={income} budget={budget} />
+        </div>
+        
+        <div className="lg:col-span-5 xl:col-span-4 lg:pl-6 lg:border-l border-white/5 pt-6 lg:pt-0">
+          <RecentTransactions
+            transactions={transactions.slice(0, 5)}
+            onTransactionDeleted={handleTransactionDeleted}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -71,6 +71,7 @@ create table if not exists public.user_settings (
   monthly_limit numeric default 20000,
   display_name text,
   currency text default 'INR',
+  category_limits jsonb default '{}'::jsonb,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

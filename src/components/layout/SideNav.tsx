@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Plus, PieChart, History, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function BottomNav() {
+export function SideNav() {
     const pathname = usePathname();
 
     const navItems = [
@@ -17,8 +17,8 @@ export function BottomNav() {
     ];
 
     return (
-        <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 md:hidden pointer-events-none">
-            <div className="w-full max-w-sm glass-nav rounded-2xl flex justify-between items-center h-16 px-2 pointer-events-auto shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        <div className="hidden md:flex fixed top-0 left-0 w-24 h-screen z-50 flex-col items-center py-8 bg-background/50 backdrop-blur-xl border-r border-white/10">
+            <div className="flex flex-col gap-8 items-center mt-8">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -28,13 +28,13 @@ export function BottomNav() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex flex-col items-center justify-center -mt-10"
+                                className="flex flex-col items-center justify-center my-4"
                             >
-                                <div className="w-16 h-16 rounded-full bg-primary text-black flex items-center justify-center shadow-[0_0_25px_rgba(176,38,255,0.5)] hover:scale-110 transition-transform active:scale-95 border-4 border-background">
-                                    <Plus size={32} />
+                                <div className="w-14 h-14 rounded-full bg-primary text-black flex items-center justify-center shadow-[0_0_25px_rgba(176,38,255,0.5)] hover:scale-110 transition-transform active:scale-95">
+                                    <Plus size={28} />
                                 </div>
                             </Link>
-                        )
+                        );
                     }
 
                     return (
@@ -45,8 +45,9 @@ export function BottomNav() {
                                 "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all relative",
                                 isActive ? "bg-white/10 text-primary" : "text-textMuted hover:text-white hover:bg-white/5"
                             )}
+                            title={item.label}
                         >
-                            <Icon className={cn("w-5 h-5", isActive && "drop-shadow-[0_0_8px_rgba(176,38,255,0.6)]")} />
+                            <Icon className={cn("w-6 h-6", isActive && "drop-shadow-[0_0_8px_rgba(176,38,255,0.6)]")} />
                         </Link>
                     );
                 })}

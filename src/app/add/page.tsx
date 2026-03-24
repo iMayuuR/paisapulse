@@ -124,10 +124,10 @@ export default function AddExpensePage() {
                 </div>
             </header>
 
-            <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-8 px-2 pb-8">
+            <form onSubmit={handleSubmit} className="flex-1 flex flex-col md:grid md:grid-cols-2 md:gap-x-12 gap-y-8 px-2 pb-8 max-w-5xl mx-auto w-full">
 
                 {/* Type Toggle */}
-                <div className="flex justify-center mt-2">
+                <div className="md:col-span-2 flex justify-center mt-2">
                     <div className="bg-black/20 p-1 rounded-2xl flex items-center gap-1 border border-white/10">
                         <button
                             type="button"
@@ -146,135 +146,155 @@ export default function AddExpensePage() {
                     </div>
                 </div>
 
-                {/* Massive Amount Input */}
-                <div className="text-center space-y-2 mt-4">
-                    <span className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Enter Amount</span>
-                    <div className="flex items-center justify-center gap-1">
-                        <span className="text-4xl font-heading text-textMuted/50 pt-2">₹</span>
-                        <input
-                            type="number"
-                            inputMode="numeric"
-                            placeholder="0"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            className="bg-transparent text-7xl font-heading font-bold text-white text-center focus:outline-none placeholder:text-white/10 caret-primary min-w-[1ch] max-w-[6ch]"
-                            autoFocus
+                {/* Left Column: Amount and Category */}
+                <div className="space-y-8">
+                    {/* Massive Amount Input */}
+                    <div className="text-center md:text-left space-y-2 mt-4">
+                        <span className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Enter Amount</span>
+                        <div className="flex items-center justify-center md:justify-start gap-1">
+                            <span className="text-4xl font-heading text-textMuted/50 pt-2">₹</span>
+                            <input
+                                type="number"
+                                inputMode="numeric"
+                                placeholder="0"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                className="bg-transparent text-7xl font-heading font-bold text-white text-center md:text-left focus:outline-none placeholder:text-white/10 caret-primary min-w-[1ch] max-w-[6ch]"
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+
+                    {/* Category Selection */}
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center px-1">
+                            <label className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Category</label>
+                        </div>
+                        <CategoryGrid
+                            categories={categories}
+                            selectedId={selectedCategoryId}
+                            onSelect={setSelectedCategoryId}
+                            onCreateCustomCategory={(groupName, name) => {
+                                const newCustomCategory: Category = {
+                                    id: `custom-${Date.now()}`,
+                                    name: name,
+                                    icon: "Tag", // Generic custom icon
+                                    is_default: false,
+                                    type: transactionType,
+                                    group: groupName
+                                };
+                                setSessionCustomCategories(prev => [...prev, newCustomCategory]);
+                                setSelectedCategoryId(newCustomCategory.id);
+                            }}
                         />
                     </div>
                 </div>
 
-                {/* Category Selection */}
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center px-1">
-                        <label className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Category</label>
-                    </div>
-                    <CategoryGrid
-                        categories={categories}
-                        selectedId={selectedCategoryId}
-                        onSelect={setSelectedCategoryId}
-                        onCreateCustomCategory={(groupName, name) => {
-                            const newCustomCategory: Category = {
-                                id: `custom-${Date.now()}`,
-                                name: name,
-                                icon: "Tag", // Generic custom icon
-                                is_default: false,
-                                type: transactionType,
-                                group: groupName
-                            };
-                            setSessionCustomCategories(prev => [...prev, newCustomCategory]);
-                            setSelectedCategoryId(newCustomCategory.id);
-                        }}
-                    />
-                </div>
-
-                <div className="space-y-6 bg-white/5 rounded-3xl p-6 border border-white/5 backdrop-blur-sm">
-                    {/* Payment Method */}
-                    <div className="space-y-3">
-                        <label className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Payment Via</label>
-                        <div className="flex flex-wrap gap-2">
-                            {PAYMENT_METHODS.map((method) => (
-                                <button
-                                    key={method}
-                                    type="button"
-                                    onClick={() => setPaymentMethod(method)}
-                                    className={cn(
-                                        "px-4 py-2.5 rounded-xl text-xs font-medium border transition-all duration-300",
-                                        paymentMethod === method
-                                            ? "bg-secondary/20 text-secondary border-secondary shadow-[0_0_15px_rgba(0,224,255,0.2)]"
-                                            : "bg-surface text-textMuted border-white/5 hover:bg-white/5 hover:text-white"
-                                    )}
-                                >
-                                    {method}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Note & Compact Date/Time Row */}
-                    <div className="space-y-4">
-                        <div className="relative">
-                            <Input
-                                placeholder="Add a note..."
-                                value={note}
-                                onChange={(e) => setNote(e.target.value)}
-                                className="bg-black/20 border-white/5 pl-4 h-12 rounded-xl focus:border-white/20"
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-textMuted hover:text-white cursor-pointer">
-                                <Mic size={16} />
+                {/* Right Column: Other Details */}
+                <div className="space-y-6">
+                    <div className="space-y-6 bg-white/5 rounded-3xl p-6 border border-white/5 backdrop-blur-sm">
+                        {/* Payment Method */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-heading font-medium tracking-widest text-textMuted uppercase">Payment Via</label>
+                            <div className="flex flex-wrap gap-2">
+                                {PAYMENT_METHODS.map((method) => (
+                                    <button
+                                        key={method}
+                                        type="button"
+                                        onClick={() => setPaymentMethod(method)}
+                                        className={cn(
+                                            "px-4 py-2.5 rounded-xl text-xs font-medium border transition-all duration-300",
+                                            paymentMethod === method
+                                                ? "bg-secondary/20 text-secondary border-secondary shadow-[0_0_15px_rgba(255,46,147,0.2)]"
+                                                : "bg-surface text-textMuted border-white/5 hover:bg-white/5 hover:text-white"
+                                        )}
+                                    >
+                                        {method}
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Combined Date & Time Row - REFINED */}
-                        <div className="flex items-center justify-between bg-black/20 px-4 rounded-2xl border border-white/5 h-16 relative overflow-hidden group">
-
-                            {/* Date Picker Section */}
-                            <div className="relative h-full flex items-center">
-                                {/* The actual input is invisible but covers the area for clicking */}
-                                <input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
+                        {/* Note & Compact Date/Time Row */}
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <Input
+                                    placeholder="Add a note..."
+                                    value={note}
+                                    onChange={(e) => setNote(e.target.value)}
+                                    className="bg-black/20 border-white/5 pl-4 h-12 rounded-xl focus:border-white/20"
                                 />
-
-                                {/* Visual Representation of Date */}
-                                <div className="pointer-events-none z-10 flex items-center gap-3 text-textMuted group-hover:text-white transition-colors">
-                                    <Calendar size={18} className="text-primary/80" />
-                                    <span className="text-base font-medium tracking-wide">
-                                        {date ? new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "Today"}
-                                    </span>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-textMuted hover:text-white cursor-pointer">
+                                    <Mic size={16} />
                                 </div>
                             </div>
 
-                            {/* Vertical Divider */}
-                            <div className="w-[1px] h-6 bg-white/10 mx-4" />
+                            {/* Combined Date & Time Row - REFINED */}
+                            <div className="flex items-center justify-between bg-black/20 px-4 rounded-2xl border border-white/5 h-16 relative overflow-hidden group">
 
-                            {/* Real-time Clock Section - Matched to Date Style - Minimalist */}
-                            <div className="flex items-center h-full">
-                                <span className="text-base font-medium tracking-wide text-textMuted group-hover:text-white transition-colors tabular-nums">
-                                    {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toLowerCase() : "--:--:--"}
-                                </span>
+                                {/* Date Picker Section */}
+                                <div className="relative h-full flex items-center">
+                                    {/* The actual input is invisible but covers the area for clicking */}
+                                    <input
+                                        type="date"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        className="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
+                                    />
+
+                                    {/* Visual Representation of Date */}
+                                    <div className="pointer-events-none z-10 flex items-center gap-3 text-textMuted group-hover:text-white transition-colors">
+                                        <Calendar size={18} className="text-primary/80" />
+                                        <span className="text-base font-medium tracking-wide">
+                                            {date ? new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "Today"}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Divider */}
+                                <div className="w-[1px] h-6 bg-white/10 mx-4" />
+
+                                {/* Real-time Clock Section - Matched to Date Style - Minimalist */}
+                                <div className="flex items-center h-full">
+                                    <span className="text-base font-medium tracking-wide text-textMuted group-hover:text-white transition-colors tabular-nums">
+                                        {currentTime ? currentTime.toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toLowerCase() : "--:--:--"}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Spacer for floating button and bottom nav */}
-                <div className="h-64 sm:h-72" />
-
-                {/* Floating Action Button */}
-                <div className="fixed bottom-32 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
-                    <div className="w-full max-w-md pointer-events-auto">
+                    {/* Desktop Submit Button */}
+                    <div className="hidden md:block pt-4">
                         <Button
                             variant="primary"
                             type="submit"
-                            style={{ backgroundColor: '#090909', opacity: 1 }} // STRICT SOLID BLACK
-                            className="w-full h-14 text-lg font-bold rounded-2xl !bg-[#090909] !text-primary border border-primary/50 shadow-[0_0_20px_rgba(212,255,0,0.2)] hover:shadow-[0_0_30px_rgba(212,255,0,0.4)] relative z-50 opacity-100"
+                            style={{ backgroundColor: '#090909', opacity: 1 }}
+                            className="w-full h-14 text-lg font-bold rounded-2xl !bg-[#090909] !text-primary border border-primary/50 shadow-[0_0_20px_rgba(176,38,255,0.2)] hover:shadow-[0_0_30px_rgba(176,38,255,0.4)]"
                             disabled={!amount || !selectedCategoryId}
                             isLoading={isSubmitting}
                         >
                             Save Transaction
                         </Button>
+                    </div>
+                </div>
+
+                {/* Spacer & Mobile Floating Button */}
+                <div className="md:hidden contents">
+                    <div className="h-64 sm:h-72" />
+                    <div className="fixed bottom-32 left-0 right-0 px-6 z-40 flex justify-center pointer-events-none">
+                        <div className="w-full max-w-md pointer-events-auto">
+                            <Button
+                                variant="primary"
+                                type="submit"
+                                style={{ backgroundColor: '#090909', opacity: 1 }}
+                                className="w-full h-14 text-lg font-bold rounded-2xl !bg-[#090909] !text-primary border border-primary/50 shadow-[0_0_20px_rgba(176,38,255,0.2)] hover:shadow-[0_0_30px_rgba(176,38,255,0.4)] relative z-50 opacity-100"
+                                disabled={!amount || !selectedCategoryId}
+                                isLoading={isSubmitting}
+                            >
+                                Save Transaction
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </form>

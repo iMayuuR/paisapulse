@@ -101,7 +101,7 @@ export function RecentTransactions({ transactions, onTransactionDeleted }: Recen
                                     >
                                         <div className="flex items-center gap-4 pointer-events-none"> {/* Disable pointer events on children during drag if needed */}
                                             <div className="w-12 h-12 rounded-2xl bg-surface border border-white/5 flex items-center justify-center text-secondary shadow-[0_0_15px_rgba(0,0,0,0.3)]">
-                                                <Icon size={20} className="drop-shadow-[0_0_5px_rgba(0,224,255,0.4)]" />
+                                                <Icon size={20} className="drop-shadow-[0_0_5px_rgba(255,46,147,0.4)]" />
                                             </div>
                                             <div>
                                                 <p className="font-heading font-medium text-white text-base tracking-tight">{transaction.category?.name || "Uncategorized"}</p>

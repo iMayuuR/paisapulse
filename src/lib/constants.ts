@@ -5,7 +5,8 @@ import {
     ArrowDownToLine, Landmark, Home, HeartPulse, Gift, Ticket, FileText,
     Smartphone, Droplet, Flame, Tv, Sofa, Leaf, Hammer, Scissors, Dog,
     Shirt, Wrench, Video, Music, Syringe, Building, GraduationCap, Receipt,
-    Baby, Package, Music2, Gamepad2, Tent, Bus, BookOpen, Tag
+    Baby, Package, Music2, Gamepad2, Tent, Bus, BookOpen, Tag,
+    TrendingUp, PiggyBank, LineChart, Gem, Activity
 } from "lucide-react";
 
 export const DEFAULT_CATEGORIES: Omit<Category, "id">[] = [
@@ -74,6 +75,16 @@ export const DEFAULT_CATEGORIES: Omit<Category, "id">[] = [
     { name: "Shipping", icon: "Package", is_default: true, color: "#8E8E93", type: "expense", group: "Miscellaneous" },
     { name: "Other Expense", icon: "MoreHorizontal", is_default: true, color: "#8E8E93", type: "expense", group: "Miscellaneous" },
 
+    // INVESTMENTS & SAVINGS
+    { name: "Stocks", icon: "TrendingUp", is_default: true, color: "#30D158", type: "expense", group: "Investments" },
+    { name: "US Stocks", icon: "LineChart", is_default: true, color: "#0A84FF", type: "expense", group: "Investments" },
+    { name: "Mutual Funds", icon: "PiggyBank", is_default: true, color: "#BF5AF2", type: "expense", group: "Investments" },
+    { name: "SIP", icon: "Activity", is_default: true, color: "#32ADE6", type: "expense", group: "Investments" },
+    { name: "LIC / Life Insurance", icon: "Shield", is_default: true, color: "#FF9500", type: "expense", group: "Investments" },
+    { name: "Gold", icon: "Gem", is_default: true, color: "#FFD60A", type: "expense", group: "Investments" },
+    { name: "Silver", icon: "Gem", is_default: true, color: "#8E8E93", type: "expense", group: "Investments" },
+    { name: "Fixed Deposits/FD", icon: "Landmark", is_default: true, color: "#5E5CE6", type: "expense", group: "Investments" },
+
     // INCOMES
     { name: "Wages/Salary", icon: "Briefcase", is_default: true, color: "#30D158", type: "income", group: "Income" },
     { name: "Interest", icon: "Landmark", is_default: true, color: "#BF5AF2", type: "income", group: "Income" },
@@ -99,5 +110,6 @@ export const ICON_MAP: Record<string, any> = {
     ArrowDownToLine, Landmark, Home, HeartPulse, Gift, Ticket, FileText,
     Smartphone, Droplet, Flame, Tv, Sofa, Leaf, Hammer, Scissors, Dog,
     Shirt, Wrench, Video, Music, Syringe, Building, GraduationCap, Receipt,
-    Baby, Package, Music2, Gamepad2, Tent, Bus, BookOpen, Tag
+    Baby, Package, Music2, Gamepad2, Tent, Bus, BookOpen, Tag,
+    TrendingUp, PiggyBank, LineChart, Gem, Activity
 };

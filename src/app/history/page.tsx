@@ -82,7 +82,7 @@ export default function HistoryPage() {
     }
 
     return (
-        <div className="space-y-6 pt-2 pb-24 min-h-full">
+        <div className="space-y-6 pt-2 pb-24 min-h-full max-w-4xl mx-auto">
             {/* Header - Transparent and Clean */}
             <header className="px-1 py-4 flex justify-between items-center">
                 <div>
@@ -179,7 +179,7 @@ export default function HistoryPage() {
                                                                         >
                                                                             <div className="flex items-center gap-4 pointer-events-none">
                                                                                 <div className="w-10 h-10 rounded-xl bg-surface border border-white/5 flex items-center justify-center text-secondary shadow-[0_0_15px_rgba(0,0,0,0.3)]">
-                                                                                    <Icon size={18} className="drop-shadow-[0_0_5px_rgba(0,224,255,0.4)]" />
+                                                                                    <Icon size={18} className="drop-shadow-[0_0_5px_rgba(255,46,147,0.4)]" />
                                                                                 </div>
                                                                                 <div>
                                                                                     <p className="font-heading font-medium text-white text-sm tracking-tight">{transaction.category?.name || "Uncategorized"}</p>

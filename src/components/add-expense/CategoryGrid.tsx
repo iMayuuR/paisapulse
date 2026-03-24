@@ -3,7 +3,7 @@
 import { Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { ICON_MAP } from "@/lib/constants";
-import { Plus, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useRef, useState } from "react";
 
 interface CategoryGridProps {
@@ -38,8 +38,15 @@ export function CategoryGrid({ categories, selectedId, onSelect, onCreateCustomC
 
     const IconCustom = ICON_MAP["Plus"];
 
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredCategories = categories.filter(cat => 
+        cat.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (cat.group && cat.group.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
     // Group categories by their 'group' property
-    const groupedCategories = categories.reduce((acc, cat) => {
+    const groupedCategories = filteredCategories.reduce((acc, cat) => {
         const groupName = cat.group || "Ungrouped";
         if (!acc[groupName]) {
             acc[groupName] = [];
@@ -50,10 +57,28 @@ export function CategoryGrid({ categories, selectedId, onSelect, onCreateCustomC
 
     return (
         <div className="space-y-6">
+            {/* Search Bar */}
+            <div className="relative mb-2">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search size={18} className="text-textMuted" />
+                </div>
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search categories..."
+                    className="w-full bg-black/20 border border-white/10 text-white rounded-xl h-12 pl-10 pr-4 focus:outline-none focus:border-primary focus:shadow-[0_0_15px_rgba(176,38,255,0.15)] placeholder:text-textMuted/50 text-sm transition-all"
+                />
+            </div>
+
             {Object.entries(groupedCategories).map(([groupName, groupCategories], index) => {
                 // Determine if group is expanded: check explicit state first, then defaults
                 let isExpanded = expandedGroups[groupName];
-                if (isExpanded === undefined) {
+                
+                // If searching, auto expand all groups that contain results
+                if (searchQuery.trim().length > 0) {
+                    isExpanded = true;
+                } else if (isExpanded === undefined) {
                     const hasSelected = groupCategories.some(c => c.id === selectedId);
                     isExpanded = hasSelected || index === 0;
                 }
@@ -91,11 +116,11 @@ export function CategoryGrid({ categories, selectedId, onSelect, onCreateCustomC
                                                 className={cn(
                                                     "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 border backdrop-blur-md",
                                                     isSelected
-                                                        ? "bg-primary/20 border-primary text-primary shadow-[0_0_20px_rgba(212,255,0,0.3)]"
+                                                        ? "bg-primary/20 border-primary text-primary shadow-[0_0_20px_rgba(176,38,255,0.3)]"
                                                         : "bg-white/5 border-white/5 text-white group-hover:bg-white/10"
                                                 )}
                                             >
-                                                <Icon size={28} className={cn(isSelected && "drop-shadow-[0_0_8px_rgba(212,255,0,0.8)]")} />
+                                                <Icon size={28} className={cn(isSelected && "drop-shadow-[0_0_8px_rgba(176,38,255,0.8)]")} />
                                             </div>
                                             <span className={cn(
                                                 "text-[10px] font-medium tracking-wide uppercase transition-colors text-center w-full leading-tight mt-1 px-0.5 break-words line-clamp-2",
@@ -125,7 +150,7 @@ export function CategoryGrid({ categories, selectedId, onSelect, onCreateCustomC
                                             }}
                                             onBlur={() => handleCustomSubmit(groupName)}
                                             placeholder="Type name & press Enter..."
-                                            className="w-full bg-black/40 border border-primary/50 text-white rounded-xl h-12 px-4 focus:outline-none focus:border-primary focus:shadow-[0_0_15px_rgba(212,255,0,0.2)] placeholder:text-textMuted/50 text-sm font-medium"
+                                            className="w-full bg-black/40 border border-primary/50 text-white rounded-xl h-12 px-4 focus:outline-none focus:border-primary focus:shadow-[0_0_15px_rgba(176,38,255,0.2)] placeholder:text-textMuted/50 text-sm font-medium"
                                             maxLength={20}
                                         />
                                     </div>

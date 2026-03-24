@@ -13,13 +13,14 @@ interface BudgetOverviewProps {
 
 export function BudgetOverview({ spent, income, budget }: BudgetOverviewProps) {
     // Actually compute net balance (Refunds perfectly cancel out mathematically)
-    const netBalance = income - spent;
+    const totalAvailable = (budget || 0) + income;
+    const netBalance = totalAvailable - spent;
 
-    // Calculate percentage based on income
-    const safeIncome = income > 0 ? income : 1; // Avoid division by zero
-    const rawPercentage = (Math.max(0, spent) / safeIncome) * 100;
+    // Calculate percentage based on total available (Budget + Income)
+    const safeTotal = totalAvailable > 0 ? totalAvailable : 1; // Avoid division by zero
+    const rawPercentage = (Math.max(0, spent) / safeTotal) * 100;
     const percentage = Math.max(0, Math.min(rawPercentage, 100));
-    const isOverBudget = spent > income;
+    const isOverBudget = spent > totalAvailable;
 
     return (
         <div className="relative group perspective-1000">
@@ -71,7 +72,7 @@ export function BudgetOverview({ spent, income, budget }: BudgetOverviewProps) {
                         <div className="flex justify-between text-xs font-medium">
                             <div className="flex items-center gap-1.5 text-textMuted">
                                 <div className={`w-1.5 h-1.5 rounded-full ${isOverBudget ? "bg-danger animate-pulse" : "bg-success"}`} />
-                                {income <= 0 ? (spent <= 0 ? "No Active Expenses" : "No Income Logged") : `${Math.round(rawPercentage)}% of Income Spent`}
+                                {totalAvailable <= 0 ? (spent <= 0 ? "No Active Expenses" : "Over Budget") : `${Math.round(rawPercentage)}% of Budget Used`}
                             </div>
                             <span className="text-white">{spent < 0 ? `+${formatCurrency(Math.abs(spent))} Net Refund` : `${formatCurrency(spent)} Spent`}</span>
                         </div>

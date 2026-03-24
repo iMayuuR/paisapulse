@@ -4,9 +4,9 @@
   --color-background: #050505;
   --color-surface: #121212;
 
-  --color-primary: #D4FF00;
-  --color-secondary: #00E0FF;
-  --color-accent: #FF00E5;
+  --color-primary: #B026FF;
+  --color-secondary: #FF2E93;
+  --color-accent: #7000FF;
 
   --color-glass: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
@@ -57,7 +57,7 @@
     }
   }
 
-  --background-image-hero-glow: conic-gradient(from 180deg at 50% 50%, #D4FF00 0deg, #00E0FF 180deg, #FF00E5 360deg);
+  --background-image-hero-glow: conic-gradient(from 180deg at 50% 50%, #B026FF 0deg, #FF2E93 180deg, #7000FF 360deg);
 }
 
 :root {

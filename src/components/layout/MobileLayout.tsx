@@ -1,6 +1,7 @@
 "use client";
 
 import { BottomNav } from "./BottomNav";
+import { SideNav } from "./SideNav";
 import { AuroraBackground } from "./AuroraBackground";
 import { usePathname } from "next/navigation";
 
@@ -13,10 +14,11 @@ export function MobileLayout({ children }: MobileLayoutProps) {
     const isAuthPage = pathname === "/login";
 
     return (
-        <div className="min-h-screen bg-background flex flex-col items-center justify-center relative">
+        <div className="min-h-screen bg-background flex flex-col md:flex-row items-center md:items-stretch justify-center relative">
             <AuroraBackground />
-            <div className="w-full max-w-md h-full min-h-screen relative z-10 flex flex-col glass-layout">
-                <main className="flex-1 pb-24 p-5 overflow-y-auto no-scrollbar">
+            {!isAuthPage && <SideNav />}
+            <div className="w-full max-w-md md:max-w-none md:ml-24 h-full min-h-screen relative z-10 flex flex-col glass-layout md:bg-transparent md:border-none md:backdrop-blur-none">
+                <main className="flex-1 pb-24 md:pb-8 pt-5 px-5 overflow-y-auto no-scrollbar max-w-7xl mx-auto w-full">
                     {children}
                 </main>
                 {!isAuthPage && <BottomNav />}

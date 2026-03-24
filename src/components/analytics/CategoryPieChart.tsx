@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
-const COLORS = ["#D4FF00", "#00E0FF", "#FF00E5", "#ffffff", "#888888"];
+const COLORS = ["#B026FF", "#FF2E93", "#7000FF", "#ffffff", "#888888"];
 
 interface CategoryPieChartProps {
     data: { name: string; value: number }[];

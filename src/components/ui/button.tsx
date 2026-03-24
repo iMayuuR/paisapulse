@@ -12,12 +12,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
 
         const variants = {
-            primary: "bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(212,255,0,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.6)] border border-primary/50",
-            secondary: "bg-secondary text-black hover:bg-secondary/90 shadow-[0_0_20px_rgba(0,224,255,0.4)]",
+            primary: "bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(176,38,255,0.4)] hover:shadow-[0_0_30px_rgba(176,38,255,0.6)] border border-primary/50",
+            secondary: "bg-secondary text-black hover:bg-secondary/90 shadow-[0_0_20px_rgba(255,46,147,0.4)]",
             outline: "border border-white/20 bg-transparent hover:bg-white/5 text-white backdrop-blur-sm",
             ghost: "bg-transparent hover:bg-white/5 text-white",
             danger: "bg-danger/10 text-danger border border-danger/20 hover:bg-danger/20",
-            neon: "bg-transparent border border-primary text-primary shadow-[inset_0_0_10px_rgba(212,255,0,0.2)] hover:shadow-[inset_0_0_20px_rgba(212,255,0,0.4),0_0_15px_rgba(212,255,0,0.4)]"
+            neon: "bg-transparent border border-primary text-primary shadow-[inset_0_0_10px_rgba(176,38,255,0.2)] hover:shadow-[inset_0_0_20px_rgba(176,38,255,0.4),0_0_15px_rgba(176,38,255,0.4)]"
         };
 
         const sizes = {

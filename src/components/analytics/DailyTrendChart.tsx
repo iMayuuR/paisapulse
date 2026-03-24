@@ -14,8 +14,8 @@ export function DailyTrendChart({ data }: DailyTrendChartProps) {
                 <AreaChart data={data}>
                     <defs>
                         <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#D4FF00" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#D4FF00" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#B026FF" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#B026FF" stopOpacity={0} />
                         </linearGradient>
                     </defs>
                     <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" strokeDasharray="5 5" />
@@ -29,14 +29,14 @@ export function DailyTrendChart({ data }: DailyTrendChartProps) {
                     <Tooltip
                         cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }}
                         contentStyle={{ backgroundColor: '#121212', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                        itemStyle={{ color: '#D4FF00', fontSize: '14px', fontWeight: 'bold', fontFamily: 'var(--font-outfit)' }}
+                        itemStyle={{ color: '#B026FF', fontSize: '14px', fontWeight: 'bold', fontFamily: 'var(--font-outfit)' }}
                         labelStyle={{ display: 'none' }}
                         formatter={(value: any) => [formatCurrency(value), '']}
                     />
                     <Area
                         type="monotone"
                         dataKey="amount"
-                        stroke="#D4FF00"
+                        stroke="#B026FF"
                         strokeWidth={3}
                         fillOpacity={1}
                         fill="url(#colorAmount)"
